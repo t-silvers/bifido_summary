@@ -38,8 +38,9 @@ rule:
         'resources/raw_{info}.xlsx'
     output:
         'results/raw_{info}.csv'
+    localrule: True
     shell:
-        'mv {input} {output}'
+        'cp {input} {output}'
 
 
 onstart:
