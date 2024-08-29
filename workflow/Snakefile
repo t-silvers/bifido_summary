@@ -25,7 +25,7 @@ rule:
     output:
         'resources/raw_{info}.xlsx'
     params:
-        url=config[wildcards.info + '_info_url']
+        url=lambda wildcards: config[wildcards.info + '_info_url']
     resources:
         slurm_partition='datatransfer'
     localrule: True
