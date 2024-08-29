@@ -14,8 +14,10 @@ module widevariant:
 rule all:
     input:
         expand(
-            'results/raw_{info}.csv',
-            info=['seq', 'sample']
+            'resources/raw_{info}.{ext}',
+            zip,
+            info=['seq', 'sample'],
+            ext=['csv', 'xlsx'],
         )
     localrule: True
     default_target: True
@@ -23,7 +25,7 @@ rule all:
 
 rule:
     output:
-        'resources/raw_{info}.xlsx'
+        'resources/raw_{info}.{ext}'
     params:
         url=lambda wildcards: config[wildcards.info + '_info_url']
     resources:
@@ -31,16 +33,6 @@ rule:
     localrule: True
     shell:
         'wget -nc -O {output} {params.url}'
-
-
-rule:
-    input:
-        'resources/raw_{info}.xlsx'
-    output:
-        'results/raw_{info}.csv'
-    localrule: True
-    shell:
-        'cp {input} {output}'
 
 
 onstart:
