@@ -14,7 +14,7 @@ module widevariant:
 rule all:
     input:
         expand(
-            'resources/raw_{info}.csv',
+            'results/raw_{info}.csv',
             info=['seq', 'sample']
         )
     localrule: True
