@@ -1,0 +1,53 @@
+from snakemake.utils import min_version
+
+min_version('8.11')
+
+
+configfile: 'config/params.json'
+
+
+module widevariant:
+    snakefile: github('fm-key-lab/widevariant_module', path='workflow/Snakefile', tag='0.0.1-alpha')
+    config: config
+
+
+rule all:
+    input:
+        'resources/raw_seqinfo.xlsx',
+        'resources/raw_samplesheet.xlsx',
+    localrule: True
+    default_target: True
+
+
+rule:
+    output:
+        'resources/raw_seqinfo.xlsx'
+    params:
+        url=config['seq_info_url']
+    resources:
+        slurm_partition='datatransfer'
+    localrule: True
+    shell:
+        'wget -nc -O {output} {params.url}'
+
+
+rule:
+    output:
+        'resources/raw_samplesheet.xlsx'
+    params:
+        url=config['sample_info_url']
+    resources:
+        slurm_partition='datatransfer'
+    localrule: True
+    shell:
+        'wget -nc -O {output} {params.url}'
+
+
+onstart:
+    shell('rm -f logs/*')
+    shell('rm -f .nextflow.log*')
+
+
+onsuccess:
+    shell(f'mkdir -p "/r/t/thosi/{config['run_id']}"')
+    shell(f'rsync -au --progress results "/r/t/thosi/{config['run_id']}/"')
