@@ -13,17 +13,19 @@ module widevariant:
 
 rule all:
     input:
-        'resources/raw_seqinfo.xlsx',
-        'resources/raw_samplesheet.xlsx',
+        expand(
+            'resources/raw_{info}.csv',
+            info=['seq', 'sample']
+        )
     localrule: True
     default_target: True
 
 
 rule:
     output:
-        'resources/raw_seqinfo.xlsx'
+        'resources/raw_{info}.xlsx'
     params:
-        url=config['seq_info_url']
+        url=config[f'{wildcards.info}_info_url']
     resources:
         slurm_partition='datatransfer'
     localrule: True
@@ -32,15 +34,12 @@ rule:
 
 
 rule:
+    input:
+        'resources/raw_{info}.xlsx'
     output:
-        'resources/raw_samplesheet.xlsx'
-    params:
-        url=config['sample_info_url']
-    resources:
-        slurm_partition='datatransfer'
-    localrule: True
+        'results/raw_{info}.csv'
     shell:
-        'wget -nc -O {output} {params.url}'
+        'mv {input} {output}'
 
 
 onstart:
@@ -50,4 +49,4 @@ onstart:
 
 onsuccess:
     shell(f'mkdir -p "/r/t/thosi/{config['run_id']}"')
-    shell(f'rsync -au --progress results "/r/t/thosi/{config['run_id']}/"')
+    shell(f'rsync -au --progress --exclude "work" results "/r/t/thosi/{config['run_id']}/"')
