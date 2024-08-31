@@ -19,9 +19,9 @@ include: 'rules/mapping.smk'
 
 rule all:
     input:
-        'logs/samplesheet.done',
+        'results/samplesheet.done',
         expand(
-            'logs/{species}/mapping.done',
+            'results/{species}/mapping.done',
             species=['Bifido']
         )
     localrule: True

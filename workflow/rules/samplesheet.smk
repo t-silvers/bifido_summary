@@ -71,5 +71,5 @@ rule:
             info=['raw_seq_info', 'samplesheet']
         )
     output:
-        touch('logs/samplesheet.done')
+        touch('results/samplesheet.done')
     localrule: True

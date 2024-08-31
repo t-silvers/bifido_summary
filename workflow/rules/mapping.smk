@@ -73,5 +73,5 @@ rule:
     input:
         mapping_output
     output:
-        touch('logs/{species}/mapping.done')
+        touch('results/{species}/mapping.done')
     localrule: True
