@@ -35,4 +35,5 @@ onstart:
 
 onsuccess:
     shell(f'mkdir -p "/r/t/thosi/{config['run_id']}"')
+    shell(f'rsync -au --progress config "/r/t/thosi/{config['run_id']}/"')
     shell(f'rsync -au --progress --exclude "work" results "/r/t/thosi/{config['run_id']}/"')

@@ -17,7 +17,6 @@ checkpoint mapping_samplesheet:
         (
             samplesheet[species_mask]
             .filter(['sample', 'fastq_1', 'fastq_2'])
-            .head(5)
             .to_csv(output[0], index=False)
         )
 
