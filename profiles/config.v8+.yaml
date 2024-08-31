@@ -7,7 +7,7 @@ benchmark-extended: true
 keep-going: false
 printshellcmds: true
 
-software-deployment-method: apptainer
+software-deployment-method: env-modules
 apptainer-args: "--bind '/tmp' --bind '/u/thosi/dev/projects' --bind '/u/thosi/dev/datasets' --bind '/ptmp/thosi' --bind '/raven/ptmp/thosi'"
 
 default-resources:
