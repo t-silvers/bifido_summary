@@ -5,6 +5,7 @@ min_version('8.11')
 
 configfile: 'config/data.json'
 configfile: 'config/params.json'
+configfile: 'config/reference.json'
 
 
 module widevariant:
@@ -12,61 +13,19 @@ module widevariant:
     config: config
 
 
+include: 'rules/samplesheet.smk'
+include: 'rules/mapping.smk'
+
+
 rule all:
     input:
-        'results/samplesheet.csv',
+        'logs/samplesheet.done',
         expand(
-            'resources/raw_{info}.{ext}',
-            zip,
-            info=['seq', 'sample'],
-            ext=['csv', 'xlsx'],
+            'logs/{species}/mapping.done',
+            species=['Bifido']
         )
     localrule: True
     default_target: True
-
-
-rule:
-    output:
-        'resources/raw_{info}.{ext}'
-    params:
-        url=lambda wildcards: config[wildcards.info + '_info_url']
-    resources:
-        slurm_partition='datatransfer'
-    localrule: True
-    shell:
-        'wget -nc -O {output} {params.url}'
-
-
-checkpoint samplesheet:
-    input:
-        'resources/raw_sample.xlsx'
-    output:
-        'results/samplesheet.csv'
-    localrule: True
-    run:
-        import babybiome_samplesheet_utils as bbb
-        import pandas as pd
-
-        read_kwargs = {
-            'engine': 'openpyxl',
-            'names': ['ID', 'species', 'relationship']
-        }
-
-        (
-            pd.read_excel(input[0], **read_kwargs)
-            .assign(
-                donor=lambda df: bbb.utils.extract_donor_id(df['ID']),
-                ID=lambda df: df['ID'].replace(regex={'_': '-'}),
-            )
-            .pipe(bbb.create_samplesheet, directory=config['data']['directory'])
-
-            # Create unique identifier, `sample`
-            .rename_axis('sample')
-            .reset_index()
-            .dropna()
-            .pipe(bbb.SamplesheetSchema.validate)
-            .to_csv(output[0], index=False)
-        )
 
 
 onstart:
