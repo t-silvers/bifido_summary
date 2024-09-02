@@ -3,13 +3,14 @@ from snakemake.utils import min_version
 min_version('8.11')
 
 
-configfile: 'config/data.json'
+configfile: 'config/my_data.json'
 configfile: 'config/params.json'
-configfile: 'config/reference.json'
+configfile: 'config/public_data.json'
+configfile: 'config/smk.json'
 
 
 module widevariant:
-    snakefile: github('fm-key-lab/widevariant_module', path='workflow/Snakefile', tag='0.0.1-alpha')
+    snakefile: github('fm-key-lab/widevariant_module', path='workflow/Snakefile', tag='0.0.3-alpha')
     config: config
 
 

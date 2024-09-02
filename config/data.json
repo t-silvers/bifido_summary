@@ -1,6 +1,0 @@
-{
-    "data": {
-        "directory": "/ptmp/thosi/datasets/230119_B001_Lib/data/",
-        "pat": "r'S\\d+_R([12])_001.fastq.gz'"
-      }    
-}
