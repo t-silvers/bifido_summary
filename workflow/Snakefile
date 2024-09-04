@@ -15,6 +15,7 @@ module widevariant:
 
 include: 'rules/samplesheet.smk'
 include: 'rules/mapping.smk'
+include: 'rules/prepare_results.smk'
 
 
 rule all:
