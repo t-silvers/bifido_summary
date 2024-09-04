@@ -31,47 +31,10 @@ use rule bactmap from widevariant as mapping with:
         nxf='-work-dir results/{species}/work -config config/bactmap.config',
         outdir='results/{species}',
     output:
-        'results/{species}/pipeline_info/pipeline_report.txt',
+        'results/{species}/multiqc/multiqc_data/multiqc_fastp.yaml',
+        'results/{species}/multiqc/multiqc_data/mqc_bcftools_stats_vqc_Count_SNP.yaml',
     localrule: True
     envmodules:
         'apptainer/1.3.2',
         'nextflow/21.10',
         'jdk/17.0.10'
-
-
-rule:
-    """Collect mapping output.
-    
-    Collect mapping output such that the sample wildcard can be
-    resolved by downstream rules.
-    """
-    input:
-        'results/{species}/pipeline_info/pipeline_report.txt'
-    output:
-        touch('results/{species}/fastp/{sample}_1.trim.fastq.gz'),
-        touch('results/{species}/fastp/{sample}_2.trim.fastq.gz'),
-    localrule: True
-
-
-def mapping_output(wildcards):
-    import pandas as pd
-
-    samples = pd.read_csv(
-        checkpoints.mapping_samplesheet.get(
-            species=wildcards.species
-        ).output[0]
-    )['sample'].astype(str)
-
-    return expand(
-        'results/{{species}}/fastp/{sample}_{read}.trim.fastq.gz',
-        sample=samples,
-        read=['1', '2']
-    )
-
-
-rule:
-    input:
-        mapping_output
-    output:
-        touch('results/{species}/mapping.done')
-    localrule: True

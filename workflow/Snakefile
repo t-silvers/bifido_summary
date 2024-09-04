@@ -3,10 +3,9 @@ from snakemake.utils import min_version
 min_version('8.11')
 
 
+configfile: 'config/public_data.json'
 configfile: 'config/my_data.json'
 configfile: 'config/params.json'
-configfile: 'config/public_data.json'
-configfile: 'config/smk.json'
 
 
 module widevariant:
@@ -21,10 +20,7 @@ include: 'rules/mapping.smk'
 rule all:
     input:
         'results/samplesheet.done',
-        expand(
-            'results/{species}/mapping.done',
-            species=['Bifido']
-        )
+        'results/results.duckdb'
     localrule: True
     default_target: True
 
