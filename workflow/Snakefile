@@ -27,11 +27,11 @@ rule all:
 
 
 onstart:
-    shell('rm -f logs/*')
+    shell('find logs -type f ! -path "logs/notebooks/*" -delete')
     shell('rm -f .nextflow.log*')
 
 
 onsuccess:
     shell(f'mkdir -p "/r/t/thosi/{config['run_id']}"')
     shell(f'rsync -au --progress config "/r/t/thosi/{config['run_id']}/"')
-    shell(f'rsync -au --progress --exclude "work" results "/r/t/thosi/{config['run_id']}/"')
+    shell(f'rsync -au --progress --exclude "work" --exclude "results/*/work" results "/r/t/thosi/{config['run_id']}/"')
