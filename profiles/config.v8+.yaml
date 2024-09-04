@@ -1,11 +1,10 @@
 executor: slurm
-jobs: 1
+jobs: 200
 latency-wait: 5
 slurm-init-seconds-before-status-checks: 5
 
-benchmark-extended: true
 keep-going: false
-printshellcmds: true
+printshellcmds: false
 
 software-deployment-method: env-modules
 apptainer-args: "--bind '/tmp' --bind '/u/thosi/dev/projects' --bind '/u/thosi/dev/datasets' --bind '/ptmp/thosi' --bind '/raven/ptmp/thosi'"
