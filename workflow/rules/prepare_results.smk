@@ -13,7 +13,7 @@ rule record_samples:
     input:
         'results/samplesheet.csv'
     output:
-        temp('results/samplesheet.duckdb'),
+        'results/samplesheet.duckdb',
     resources:
         cpus_per_task=1,
         mem_mb=1_024
@@ -38,7 +38,7 @@ rule record_total_reads:
             species=SPECIES
         )
     output:
-        temp('results/total_reads.duckdb'),
+        'results/total_reads.duckdb',
     resources:
         cpus_per_task=8,
         mem_mb=16_000
@@ -60,7 +60,7 @@ rule record_variant_quality_scores:
             species=SPECIES
         )
     output:
-        temp('results/variant_quality_scores.duckdb'),
+        'results/variant_quality_scores.duckdb',
     resources:
         cpus_per_task=8,
         mem_mb=16_000
