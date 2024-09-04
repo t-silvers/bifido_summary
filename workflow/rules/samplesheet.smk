@@ -34,7 +34,7 @@ rule:
 
 checkpoint samplesheet:
     input:
-        'results/raw_sample_info.xlsx'
+        ancient('results/raw_sample_info.xlsx')
     output:
         'results/samplesheet.csv'
     localrule: True
