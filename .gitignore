@@ -9,6 +9,7 @@ report/*
 # Log directories, caches
 # -----------------------
 logs/*
+dev
 
 # Nextflow
 .nextflow
