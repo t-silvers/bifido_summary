@@ -72,7 +72,7 @@ rule veryfasttree:
     shell:
         '''
         export OMP_PLACES=threads
-        { veryfasttree {input} -double-precision -nt -threads {resources.cpus_per_task} > {output}; } || touch {output}
+        veryfasttree {input} -double-precision -nt -threads {resources.cpus_per_task} > {output}; || touch {output}
         '''
 
 
