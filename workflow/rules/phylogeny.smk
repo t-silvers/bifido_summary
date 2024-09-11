@@ -107,7 +107,7 @@ rule raxml_ng:
         'results/{species}/snpsites/{donor}/{relationship}/{time}.filtered_alignment.fas',
     params:
         extra='--all --model GTR+G --bs-trees 200',
-        prefix='results/{species}/raxml_ng/{donor}/{relationship}/{time}',
+        prefix='results/{species}/raxml_ng/{donor}/{relationship}/{time}_complete',
     output:
         multiext(
             'results/{species}/raxml_ng/{donor}/{relationship}/{time}_complete.raxml',
