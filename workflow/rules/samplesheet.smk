@@ -43,8 +43,8 @@ checkpoint samplesheet:
             .assign(
                 donor=lambda df: bbb.utils.extract_donor_id(df['ID']),
                 ID=lambda df: df.pop('ID').replace(regex={'_': '-'}),
-                relationship=lambda df: df['relationship-time'].str.extract('(\w+)-'),
-                time_cat=lambda df: df.pop('relationship-time').str.extract('-(\w+)'),
+                relationship=lambda df: df['relationship-time'].str.extract(r'(\w+)-'),
+                time_cat=lambda df: df.pop('relationship-time').str.extract(r'-(\w+)'),
                 time_weeks=lambda df: df['time_cat'].replace({'vor': -2, '2Wochen': 2, '4Wochen':4}),
             )
             .pipe(bbb.create_samplesheet, directory=config['data']['directory'])
