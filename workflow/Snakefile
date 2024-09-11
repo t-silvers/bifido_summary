@@ -31,10 +31,9 @@ wildcard_constraints:
 
 rule all:
     input:
-        # 'results/samplesheet.done',
-        # 'results/phylogenies.done',
-        # 'results/samplesheet.duckdb',
-        expand('results/{species}/pipeline_info/pipeline_report.txt', species=config['wildcards']['species'].split('|'))
+        'results/samplesheet.done',
+        'results/phylogenies.done',
+        'results/samplesheet.duckdb',
     localrule: True
     default_target: True
 
