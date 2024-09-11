@@ -19,11 +19,11 @@ rule:
 def candidate_variant_tables(wildcards):
     import pandas as pd
 
-    sample_ids = pd.read_csv(
-        checkpoints.mapping_samplesheet.get(
-            species=wildcards.species,
-        ).output[0]
-    )['sample'].astype(str)
+    mapping_samplesheet_path = checkpoints.mapping_samplesheet.get(
+        species=wildcards.species,
+    ).output[0]
+    
+    sample_ids = pd.read_csv(mapping_samplesheet_path)['sample'].astype(str)
 
     return expand(
         'results/{{species}}/variants/{sample}_af.tsv',
