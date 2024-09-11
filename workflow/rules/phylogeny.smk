@@ -64,7 +64,7 @@ rule veryfasttree:
     params:
         extra='-double-precision -nt'
     output:
-        'results/{species}/veryfasttree/{donor}/{relationship}/{time}_2000.veryfasttree.phylogeny.nhx',
+        'results/{species}/veryfasttree/{donor}/{relationship}/{time}_complete.veryfasttree.phylogeny.nhx',
     resources:
         cpus_per_task=32,
         mem_mb=64_000,
@@ -110,7 +110,7 @@ rule raxml_ng:
         prefix='results/{species}/raxml_ng/{donor}/{relationship}/{time}',
     output:
         multiext(
-            'results/{species}/raxml_ng/{donor}/{relationship}/{time}_2000.raxml',
+            'results/{species}/raxml_ng/{donor}/{relationship}/{time}_complete.raxml',
             '.reduced.phy',
             '.rba',
             '.bestTreeCollapsed',
@@ -166,8 +166,8 @@ def trees_output(wildcards):
         .transpose()
         .apply(
             lambda df: [output.format(**df.to_dict()) for output in [
-                'results/{species}/veryfasttree/{donor}/{relationship}/{time_cat}_2000.veryfasttree.phylogeny.nhx',
-                'results/{species}/raxml_ng/{donor}/{relationship}/{time_cat}_2000.raxml.bestTree'
+                'results/{species}/veryfasttree/{donor}/{relationship}/{time_cat}_complete.veryfasttree.phylogeny.nhx',
+                'results/{species}/raxml_ng/{donor}/{relationship}/{time_cat}_complete.raxml.bestTree'
             ]]
         )
         .values
@@ -181,5 +181,5 @@ rule:
     input:
         trees_output
     output:
-        touch('results/phylogenies_2000.done')
+        touch('results/phylogenies_complete.done')
     localrule: True
