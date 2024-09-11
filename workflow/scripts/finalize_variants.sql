@@ -65,11 +65,11 @@ copy (
                 strlen(ref) = 1 
                 and strlen(alt) = 1 
                 -- ~ * ~ * ~ * ~
-                and alt_fwd_dp >= cast(getenv('ALT_STRAND_DP_THRESHOLD') as bigint)
-                and alt_rev_dp >= cast(getenv('ALT_STRAND_DP_THRESHOLD') as bigint)
-                and dp >= cast(getenv('COVERAGE_THRESHOLD') as usmallint)
+                and alt_fwd_dp >= cast(getenv('ALT_STRAND_DP_THRESHOLD') as usmallint)
+                and alt_rev_dp >= cast(getenv('ALT_STRAND_DP_THRESHOLD') as usmallint)
+                and dp >= cast(getenv('COVERAGE_THRESHOLD') as double)
                 and maf >= cast(getenv('MAF_THRESHOLD') as double) 
-                and qual >= cast(getenv('QUAL_THRESHOLD') as usmallint) 
+                and qual >= cast(getenv('QUAL_THRESHOLD') as double) 
         ) variant_data
         on template.sample = variant_data.sample
             and selected.chrom = variant_data.chrom
