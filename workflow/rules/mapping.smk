@@ -12,7 +12,7 @@ checkpoint mapping_samplesheet:
         if wildcards.species == 'Control':
             species_mask = samplesheet['species'].isna()
         else:
-            species_mask = samplesheet['species'] == species_key.get(wildcards.species)
+            species_mask = samplesheet['species'] == wildcards.species
 
         (
             samplesheet[species_mask]
