@@ -25,7 +25,7 @@ rule:
 # NOTE: Not all FASTQ files in directory have info in sample sheet
 checkpoint samplesheet:
     input:
-        ancient('results/raw_sample_info.xlsx')
+        'results/raw_sample_info.xlsx'
     output:
         'results/samplesheet.csv'
     localrule: True
