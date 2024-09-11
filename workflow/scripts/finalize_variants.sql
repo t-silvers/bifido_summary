@@ -47,10 +47,11 @@ copy (
             from candidate_variant_tbl
             where 
                 "sample" in (
-                    select cast(cast("sample" as varchar) as samples)
+                    select try_cast(cast("sample" as varchar) as samples) as sample_
                     from read_csv(getenv('SAMPLESHEET'))
                     where
-                        "donor" = getenv('DONOR')
+                        sample_ is not null
+                        and "donor" = getenv('DONOR')
                         and "relationship" = getenv('RELATIONSHIP')
                         and "time_cat" = getenv('TIME_CAT')
                         and "donor" = getenv('DONOR')
@@ -67,9 +68,9 @@ copy (
                 -- ~ * ~ * ~ * ~
                 and alt_fwd_dp >= cast(getenv('ALT_STRAND_DP_THRESHOLD') as usmallint)
                 and alt_rev_dp >= cast(getenv('ALT_STRAND_DP_THRESHOLD') as usmallint)
-                and dp >= cast(getenv('COVERAGE_THRESHOLD') as double)
+                and dp >= cast(getenv('COVERAGE_THRESHOLD') as usmallint)
                 and maf >= cast(getenv('MAF_THRESHOLD') as double) 
-                and qual >= cast(getenv('QUAL_THRESHOLD') as double) 
+                and qual >= cast(getenv('QUAL_THRESHOLD') as usmallint) 
         ) variant_data
         on template.sample = variant_data.sample
             and selected.chrom = variant_data.chrom
