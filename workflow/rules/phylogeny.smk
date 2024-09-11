@@ -144,12 +144,21 @@ def trees_output(wildcards):
         ).output[0]
     )
 
-    return list(
+    tree_output = list(
         samplesheet[
             samplesheet['species'].isin('Bifidobacterium_spp'.split('|'))
             & samplesheet['donor'].isin('B001'.split('|'))
             & samplesheet['relationship'].isin('Vater|Mutter|Baby'.split('|'))
             & samplesheet['time_cat'].isin('vor|2Wochen|4Wochen'.split('|'))
+        ]
+        # TODO: Dynamically parse MSAs that shouldn't be used for trees
+        [
+            ~(
+                (samplesheet['species'] == 'Bifidobacterium_spp') 
+                & (samplesheet['donor'] == 'B001') 
+                & (samplesheet['relationship'] == 'Vater') 
+                & (samplesheet['time_cat'] == '4Wochen')
+            )
         ]
         .filter(['species', 'donor', 'relationship', 'time_cat'])
         .drop_duplicates()
@@ -163,6 +172,8 @@ def trees_output(wildcards):
         .values
         .flatten()
     )
+
+    return tree_output
 
 
 rule:
