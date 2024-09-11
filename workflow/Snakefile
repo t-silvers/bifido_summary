@@ -32,8 +32,8 @@ wildcard_constraints:
 rule all:
     input:
         'results/samplesheet.done',
-        'results/phylogenies.done',
         'results/samplesheet.duckdb',
+        'results/phylogenies_2000.done',
     localrule: True
     default_target: True
 

@@ -61,8 +61,10 @@ rule veryfasttree:
     """
     input:
         'results/{species}/snpsites/{donor}/{relationship}/{time}.filtered_alignment.fas',
+    params:
+        extra='-double-precision -nt'
     output:
-        'results/{species}/veryfasttree/{donor}/{relationship}/{time}.veryfasttree.phylogeny.nhx',
+        'results/{species}/veryfasttree/{donor}/{relationship}/{time}_2000.veryfasttree.phylogeny.nhx',
     resources:
         cpus_per_task=32,
         mem_mb=64_000,
@@ -72,7 +74,7 @@ rule veryfasttree:
     shell:
         '''
         export OMP_PLACES=threads
-        veryfasttree {input} -double-precision -nt -threads {resources.cpus_per_task} > {output}; || touch {output}
+        (veryfasttree {input} {params.extra} -threads {resources.cpus_per_task} > {output}) || touch {output}
         '''
 
 
@@ -108,7 +110,7 @@ rule raxml_ng:
         prefix='results/{species}/raxml_ng/{donor}/{relationship}/{time}',
     output:
         multiext(
-            'results/{species}/raxml_ng/{donor}/{relationship}/{time}.raxml',
+            'results/{species}/raxml_ng/{donor}/{relationship}/{time}_2000.raxml',
             '.reduced.phy',
             '.rba',
             '.bestTreeCollapsed',
@@ -164,8 +166,8 @@ def trees_output(wildcards):
         .transpose()
         .apply(
             lambda df: [output.format(**df.to_dict()) for output in [
-                'results/{species}/veryfasttree/{donor}/{relationship}/{time_cat}.veryfasttree.phylogeny.nhx',
-                'results/{species}/raxml_ng/{donor}/{relationship}/{time_cat}.raxml.bestTree'
+                'results/{species}/veryfasttree/{donor}/{relationship}/{time_cat}_2000.veryfasttree.phylogeny.nhx',
+                'results/{species}/raxml_ng/{donor}/{relationship}/{time_cat}_2000.raxml.bestTree'
             ]]
         )
         .values
@@ -179,5 +181,5 @@ rule:
     input:
         trees_output
     output:
-        touch('results/phylogenies.done')
+        touch('results/phylogenies_2000.done')
     localrule: True
