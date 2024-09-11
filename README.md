@@ -3,5 +3,6 @@
 ## Usage
 
 ```bash
-$GROUP_HOME/tools/utility-scripts/pre_smk.sh "bifido_summary" " -n"
+module load task
+task -t $GROUP_HOME/tools/lab-tasks smk:run PROJ="bifido_summary" EXTRA=" -n"
 ```

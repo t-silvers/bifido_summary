@@ -17,13 +17,23 @@ module widevariant:
 
 include: 'rules/samplesheet.smk'
 include: 'rules/mapping.smk'
+include: 'rules/variants.smk'
+include: 'rules/phylogeny.smk'
 include: 'rules/prepare_results.smk'
+
+
+wildcard_constraints:
+    donors=config['wildcards']['donors'],
+    relationships=config['wildcards']['relationships'],
+    species=config['wildcards']['species'],
+    time_cat=config['wildcards']['time_cat']
 
 
 rule all:
     input:
         'results/samplesheet.done',
-        'results/results.duckdb'
+        'results/phylogenies.done',
+        'results/samplesheet.duckdb',
     localrule: True
     default_target: True
 
@@ -35,5 +45,5 @@ onstart:
 
 onsuccess:
     shell(f'mkdir -p "/r/t/thosi/{config['run_id']}"')
-    shell(f'rsync -au --progress config "/r/t/thosi/{config['run_id']}/"')
-    shell(f'rsync -au --progress --exclude "work" --exclude "results/*/work" results "/r/t/thosi/{config['run_id']}/"')
+    # shell(f'rsync -au --progress config "/r/t/thosi/{config['run_id']}/"')
+    # shell(f'rsync -au --progress --exclude "work" --exclude "results/*/work" results "/r/t/thosi/{config['run_id']}/"')

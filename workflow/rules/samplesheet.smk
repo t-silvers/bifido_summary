@@ -1,13 +1,3 @@
-species_key = {
-    'Ecoli': 'Escherichia coli',
-    'Bifido': 'Bifidobacterium spp',
-    'Bovatus': 'Bacteroides ovatus/xylanisolvens',
-    'Efaecalis': 'Enterococcus faecalis',
-    'Koxytoca': 'Klebsiella oxytoca',
-    'Control': None
-}
-
-
 rule:
     output:
         'results/raw_seq_info.csv'
@@ -32,6 +22,7 @@ rule:
         'wget -nc -O {output} {params.url}'
 
 
+# NOTE: Not all FASTQ files in directory have info in sample sheet
 checkpoint samplesheet:
     input:
         ancient('results/raw_sample_info.xlsx')
@@ -44,14 +35,17 @@ checkpoint samplesheet:
 
         read_kwargs = {
             'engine': 'openpyxl',
-            'names': ['ID', 'species', 'relationship']
+            'names': ['ID', 'species', 'relationship-time']
         }
 
         (
             pd.read_excel(input[0], **read_kwargs)
             .assign(
                 donor=lambda df: bbb.utils.extract_donor_id(df['ID']),
-                ID=lambda df: df['ID'].replace(regex={'_': '-'}),
+                ID=lambda df: df.pop('ID').replace(regex={'_': '-'}),
+                relationship=lambda df: df['relationship-time'].str.extract('(\w+)-'),
+                time_cat=lambda df: df.pop('relationship-time').str.extract('-(\w+)'),
+                time_weeks=lambda df: df['time_cat'].replace({'vor': -2, '2Wochen': 2, '4Wochen':4}),
             )
             .pipe(bbb.create_samplesheet, directory=config['data']['directory'])
 
@@ -59,6 +53,8 @@ checkpoint samplesheet:
             .rename_axis('sample')
             .reset_index()
             .dropna()
+
+            .assign(species=lambda df: df.pop('species').str.replace(' ', '_'))
             .pipe(bbb.SamplesheetSchema.validate)
             .to_csv(output[0], index=False)
         )

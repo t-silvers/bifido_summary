@@ -1,3 +1,17 @@
 {
-    "run_id": "20240831_bifido_all"
+	"bactmap_cfg": "/nexus/posix0/MPIIB-keylab/config/nextflow/bactmap.config",
+	"wildcards": {
+		"donors": "B001",
+		"relationships": "Vater|Mutter|Baby",
+		"species": "Bifidobacterium_spp",
+		"time_cat": "vor|2Wochen|4Wochen"
+	},
+	"variants_thresh": {
+		"reads_alt": 3,
+		"coverage": 20,
+		"interpos_dist": 500,
+		"maf": ".95",
+		"qual": 30
+	},
+	"run_id": "20240911_bifido_all"
 }
