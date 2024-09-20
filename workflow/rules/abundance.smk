@@ -1,6 +1,14 @@
 def paired_fastqs(wildcards):
     import pandas as pd
 
+    print(pd.read_csv(
+            checkpoints.samplesheet.get(**wildcards).output[0]
+        ))
+
+    print(pd.read_csv(
+            checkpoints.samplesheet.get(**wildcards).output[0]
+        ).dtypes)
+
     fastqs = (
         pd.read_csv(
             checkpoints.samplesheet.get(**wildcards).output[0]
