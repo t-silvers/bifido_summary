@@ -16,6 +16,7 @@ module widevariant:
 
 
 include: 'rules/samplesheet.smk'
+include: 'rules/abundance.smk'
 include: 'rules/mapping.smk'
 include: 'rules/variants.smk'
 include: 'rules/phylogeny.smk'
@@ -23,6 +24,7 @@ include: 'rules/prepare_results.smk'
 
 
 wildcard_constraints:
+    sample='\d+',
     donors=config['wildcards']['donors'],
     relationships=config['wildcards']['relationships'],
     species=config['wildcards']['species'],
@@ -33,7 +35,8 @@ rule all:
     input:
         'results/samplesheet.done',
         'results/samplesheet.duckdb',
-        'results/phylogenies_complete.done',
+        'results/abundance.done',
+        # 'results/phylogenies.done',
     localrule: True
     default_target: True
 
