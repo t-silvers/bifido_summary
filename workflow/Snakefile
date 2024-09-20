@@ -24,7 +24,7 @@ include: 'rules/prepare_results.smk'
 
 
 wildcard_constraints:
-    sample="\d+",
+    sample=r'\d+',
     donors=config['wildcards']['donors'],
     relationships=config['wildcards']['relationships'],
     species=config['wildcards']['species'],

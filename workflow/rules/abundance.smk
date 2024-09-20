@@ -1,7 +1,7 @@
 def paired_fastqs(wildcards):
     import pandas as pd
 
-    return (
+    fastqs = (
         pd.read_csv(
             checkpoints.samplesheet.get(**wildcards).output[0]
         )
@@ -13,23 +13,12 @@ def paired_fastqs(wildcards):
         .flatten()
     )
 
+    print(fastqs)
+    
+    return fastqs
+
 
 rule kraken2:
-    """Analysis using Kraken2.
-
-    Returns:
-        Kraken Report File: (tab-delimited columns)
-          - Percentage of reads for the subtree rooted at this taxon
-          - Total number of reads for the subtree rooted at this taxon
-          - Number of reads assigned directly to this taxon level
-          - Taxonomical Rank [U, -, D, P, C, O, F, G, S]
-          - NCBI Taxonomy ID
-          - Scientific Name - Indented (2 spaces per level)
-
-    References:
-        - https://ccb.jhu.edu/software/bracken/index.shtml?t=manual#format
-        - https://ccb.jhu.edu/software/kraken/dl/README
-    """
     input:
         paired_fastqs
     output:
@@ -59,30 +48,6 @@ rule kraken2:
 
 
 rule bracken:
-    """Abundance estimation using Bracken.
-
-    Args:
-        Kraken Report File: (bracken input file; tab-delimited columns) (see rule kraken2)
-
-    Returns:
-        Bracken-Recalculated Kraken Report File: (bracken input file; tab-delimited columns) (see rule kraken2)
-
-          For input kraken2 report `/path/to/file.kreport`, Bracken generates 
-          `/path/to/file_bracken_species.kreport`, and appears constrained to match the 
-          input file pattern.
-
-        Bracken Output File Format: (bracken output file; tab-delimited columns)
-          - Name
-          - Taxonomy ID
-          - Level ID (S=Species, G=Genus, O=Order, F=Family, P=Phylum, K=Kingdom)
-          - Kraken Assigned Reads
-          - Added Reads with Abundance Reestimation
-          - Total Reads after Abundance Reestimation
-          - Fraction of Total Reads
-
-    References:
-        https://ccb.jhu.edu/software/bracken/index.shtml?t=manual#step3
-    """
     input:
         'results/kraken2/{sample}.k2report',
     output:
