@@ -1,7 +1,7 @@
 def paired_fastqs(wildcards):
     import pandas as pd
 
-    fastqs = (
+    return (
         pd.read_csv(
             checkpoints.samplesheet.get(**wildcards).output[0]
         )
@@ -12,10 +12,6 @@ def paired_fastqs(wildcards):
         .values
         .flatten()
     )
-
-    print(fastqs)
-    
-    return fastqs
 
 
 rule kraken2:
@@ -30,11 +26,13 @@ rule kraken2:
         cpus_per_task=4,
         mem_mb=96_000,
         runtime=10,
-    localrule: True
     envmodules:
+        'intel/21.2.0',
+        'impi/2021.2',
         'kraken2/2.1.3'
     shell:
         '''
+        export OMP_PLACES=threads
         kraken2 \
           --db {params.db} \
           --threads {resources.cpus_per_task} \
