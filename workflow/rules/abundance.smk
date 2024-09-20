@@ -1,24 +1,17 @@
 def paired_fastqs(wildcards):
     import pandas as pd
 
-    samplesheet = (
+    return (
         pd.read_csv(
-            checkpoints.samplesheet.get(
-                **wildcards
-            ).output[0]
+            checkpoints.samplesheet.get(**wildcards).output[0]
         )
-    )
-
-    fastq_files = (
-        samplesheet[
-            samplesheet['sample'] == wildcards.sample
-        ]
+        .query(
+            f"sample == '{wildcards['sample']}'"
+        )
         .filter(like='fastq', axis=1)
         .values
         .flatten()
     )
-
-    return list(fastq_files)
 
 
 rule kraken2:
@@ -48,6 +41,7 @@ rule kraken2:
         cpus_per_task=4,
         mem_mb=96_000,
         runtime=10,
+    localrule: True
     envmodules:
         'kraken2/2.1.3'
     shell:
