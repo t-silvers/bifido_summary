@@ -2,24 +2,28 @@ rule:
     output:
         'results/raw_seq_info.csv'
     params:
-        url=config['seq_info_url']
+        path=config["samplesheet"]['seq_info']
     resources:
         slurm_partition='datatransfer'
     localrule: True
+    envmodules:
+        'rclone/1.67.0'
     shell:
-        'wget -nc -O {output} {params.url}'
+        'rclone copyto "nextcloud:{params.path}" {output}'
 
 
 rule:
     output:
         'results/raw_sample_info.xlsx'
     params:
-        url=config['sample_info_url']
+        path=config["samplesheet"]['sample_info']
     resources:
         slurm_partition='datatransfer'
     localrule: True
+    envmodules:
+        'rclone/1.67.0'
     shell:
-        'wget -nc -O {output} {params.url}'
+        'rclone copyto "nextcloud:{params.path}" {output}'
 
 
 checkpoint samplesheet:
