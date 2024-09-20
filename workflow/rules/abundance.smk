@@ -18,7 +18,7 @@ def paired_fastqs(wildcards):
         .flatten()
     )
 
-    return fastq_files
+    return list(fastq_files)
 
 
 rule kraken2:
@@ -52,7 +52,15 @@ rule kraken2:
         'kraken2/2.1.3'
     shell:
         '''
-        kraken2 --db {params.db} --threads {resources.cpus_per_task} --output {output[0]} --report {output[1]} {input}
+        kraken2 \
+          --db {params.db} \
+          --threads {resources.cpus_per_task} \
+          --report-minimizer-data \
+          --paired \
+          --minimum-hit-groups 3 \
+          --output {output[0]} \
+          --report {output[1]} \
+          {input}
         '''
 
 
