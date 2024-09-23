@@ -86,7 +86,7 @@ rule:
     input:
         species_abundance_output
     params:
-        glob="'results/{species}/bracken/*.bracken'"
+        glob="'results/bracken/*.bracken'"
     output:
         'results/abundance.duckdb'
     resources:
