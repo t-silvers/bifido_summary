@@ -35,7 +35,7 @@ rule all:
     input:
         'results/samplesheet.done',
         'results/samplesheet.duckdb',
-        'results/abundance.done',
+        'results/abundance.duckdb',
         # 'results/phylogenies.done',
     localrule: True
     default_target: True

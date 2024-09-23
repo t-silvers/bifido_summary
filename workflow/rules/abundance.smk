@@ -85,6 +85,18 @@ def species_abundance_output(wildcards):
 rule:
     input:
         species_abundance_output
+    params:
+        glob="'results/{species}/bracken/*.bracken'"
     output:
-        touch('results/abundance.done')
-    localrule: True
+        'results/abundance.duckdb'
+    resources:
+        cpus_per_task=8,
+        mem_mb=4_000,
+        runtime=15
+    envmodules:
+        'duckdb/nightly'
+    shell:
+        '''
+        export MEMORY_LIMIT="$(({resources.mem_mb} / 1000))GB" BRACKEN_GLOB={params.glob}
+        duckdb {output} -c ".read workflow/scripts/create_abundance_db.sql"
+        '''
