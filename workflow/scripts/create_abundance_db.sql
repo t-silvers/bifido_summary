@@ -3,15 +3,14 @@ set threads = getenv('SLURM_CPUS_PER_TASK');
 
 create table abundance as
 select 
-    * exclude("filename")
-    , regexp_extract(
+	regexp_extract(
         "filename",
         'bracken/(\d+).bracken',
         1
-    )
+    ) as "sample"
+    , * exclude("filename")
 from read_csv(
     getenv('BRACKEN_GLOB'),
-    -- '/ptmp/thosi/bifido_summary/results/bracken/*.bracken',
 	auto_detect = false,
 	header = true,
 	delim = '\t',
