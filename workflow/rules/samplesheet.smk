@@ -30,7 +30,7 @@ checkpoint samplesheet:
     input:
         'results/raw_sample_info.xlsx'
     params:
-        data_glob=config['data']['directory'] + '*.fastq.gz'
+        data_glob=f"'{config['data']['directory']}*.fastq.gz'"
     output:
         multiext('results/samplesheet', '.duckdb', '.csv')
     localrule: True
@@ -40,7 +40,7 @@ checkpoint samplesheet:
         '''
         export MEMORY_LIMIT="8GB" \
                SLURM_CPUS_PER_TASK=2 \
-               FASTQS_DIR="'{params.data_glob}'" \
+               FASTQS_DIR={params.data_glob} \
                SAMPLESHEET="{input}"
 
         duckdb -csv -init workflow/scripts/create_samplesheet_db.sql {output[0]} \
