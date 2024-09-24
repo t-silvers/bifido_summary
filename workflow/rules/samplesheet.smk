@@ -44,7 +44,7 @@ checkpoint samplesheet:
         '''
         export MEMORY_LIMIT="8GB" SLURM_CPUS_PER_TASK=2 SAMPLESHEET="{input}"
         duckdb {output[0]} -c \
-        ".read workflow/scripts/create_samplesheet_db.sql;
+        ".read workflow/scripts/create_samplesheet_db.sql
         .mode csv
         set enable_progress_bar = false;
         copy samplesheet to '/dev/stdout';" > {output[1]}
