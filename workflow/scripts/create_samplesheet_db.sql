@@ -148,10 +148,7 @@ left join date_ref as d_ref
 on d_ref.time_cat = samples.time_cat;
 
 create table samplesheet as
-select 
-    samples.*
-    , fastqs.file
-    , fastqs.read 
+select samples.*, fastqs.fastq_1, fastqs.fastq_2 
 from fastqs, samples 
 where fastqs.ID = samples.ID 
 order by samples.ID;
