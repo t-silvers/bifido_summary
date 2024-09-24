@@ -38,12 +38,13 @@ checkpoint samplesheet:
         'duckdb/1.0'
     shell:
         '''
-        export MEMORY_LIMIT="8GB" SLURM_CPUS_PER_TASK=2 SAMPLESHEET="{input}"
+        export MEMORY_LIMIT="8GB" \
+               SLURM_CPUS_PER_TASK=2 \
+               FASTQS_DIR="'{params.data_glob}'" \
+               SAMPLESHEET="{input}"
 
-        realpath {params.data_glob} |\
-            duckdb -csv -init workflow/scripts/create_samplesheet_db.sql {output[0]} \
-                -c "set enable_progress_bar = false; copy samplesheet to '/dev/stdout';" \
-            > {output[1]}
+        duckdb -csv -init workflow/scripts/create_samplesheet_db.sql {output[0]} \
+            -c "set enable_progress_bar = false; copy samplesheet to '/dev/stdout';" > {output[1]}
         '''
 
 

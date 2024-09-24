@@ -3,8 +3,6 @@ set threads = getenv('SLURM_CPUS_PER_TASK');
 
 load spatial;
 
-create table fastq_paths as select * from read_csv('/dev/stdin', header = false);
-
 create type family_relationship as enum ('F', 'M', 'B');
 
 create temp table relationship_ref (
@@ -71,7 +69,26 @@ values
     ('3Monate', 13), 
     ('6Monate', 26);
 
-create table samplesheet as 
+create temp table fastqs as
+pivot (
+    select 
+        struct_extract(ID_read, 'ID') as ID
+        , "file"
+        , 'fastq_' || struct_extract(ID_read, 'read') as "read"
+    from (
+        select
+            "file" 
+            , regexp_extract(
+                "file",
+                'mpimg_L\d+-\d_(B001-\d+)_S\d+_R(1|2)_001.fastq.gz',
+                ['ID', 'read']
+            ) as ID_read
+        from glob(getenv('FASTQS_DIR'))
+    )
+    where strlen(ID) > 0
+) on "read" using first("file") group by ID;
+
+create temp table samples as 
 with combined_tmp as (
     select * exclude(taxon_raw)
         , regexp_replace(trim(taxon_raw), ' ', '_', 'g') as taxon_raw
@@ -129,3 +146,12 @@ left join taxon_ref as t_ref
 on t_ref.taxon_raw = samples.taxon_raw
 left join date_ref as d_ref
 on d_ref.time_cat = samples.time_cat;
+
+create table samplesheet as
+select 
+    samples.*
+    , fastqs.file
+    , fastqs.read 
+from fastqs, samples 
+where fastqs.ID = samples.ID 
+order by samples.ID;
