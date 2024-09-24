@@ -69,7 +69,7 @@ values
     ('3Monate', 13), 
     ('6Monate', 26);
 
-create temp table fastqs as
+create table fastqs as
 pivot (
     select 
         struct_extract(ID_read, 'ID') as ID
@@ -147,8 +147,10 @@ on t_ref.taxon_raw = samples.taxon_raw
 left join date_ref as d_ref
 on d_ref.time_cat = samples.time_cat;
 
-create table samplesheet as
-select samples.*, fastqs.fastq_1, fastqs.fastq_2 
-from fastqs, samples 
-where fastqs.ID = samples.ID 
-order by samples.ID;
+-- create table samplesheet as
+-- select samples.*, fastqs.fastq_1, fastqs.fastq_2 
+-- from fastqs, samples 
+-- where fastqs.ID = samples.ID 
+-- order by samples.ID;
+
+create table samplesheet as select * from samples;
