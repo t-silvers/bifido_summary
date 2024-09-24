@@ -33,7 +33,7 @@ wildcard_constraints:
 
 rule all:
     input:
-        multiext('results/test_samplesheet', '.duckdb', '.csv')
+        multiext('results/samplesheet', '.duckdb', '.csv')
         # 'results/samplesheet.done',
         # 'results/samplesheet.duckdb',
         # 'results/abundance.duckdb',

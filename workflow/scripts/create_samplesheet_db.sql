@@ -3,6 +3,8 @@ set threads = getenv('SLURM_CPUS_PER_TASK');
 
 load spatial;
 
+create table fastq_paths as select * from read_csv('/dev/stdin', header = false);
+
 create type family_relationship as enum ('F', 'M', 'B');
 
 create temp table relationship_ref (
