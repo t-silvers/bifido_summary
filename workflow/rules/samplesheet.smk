@@ -43,6 +43,12 @@ checkpoint samplesheet:
                FASTQS_DIR={params.data_glob} \
                SAMPLESHEET="{input}"
 
+        duckdb {output[0]} \
+            -c ".read workflow/scripts/create_fastqs_db.sql"
+
+        duckdb -init workflow/scripts/create_types.sql {output[0]} \
+            -c ".read workflow/scripts/create_sample_info_db.sql"
+
         duckdb -csv -init workflow/scripts/create_samplesheet_db.sql {output[0]} \
             -c "set enable_progress_bar = false; copy samplesheet to '/dev/stdout';" > {output[1]}
         '''
