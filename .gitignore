@@ -10,6 +10,7 @@ report/*
 # -----------------------
 logs/*
 dev
+archive
 
 # Nextflow
 .nextflow
