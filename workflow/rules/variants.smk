@@ -30,19 +30,28 @@ def candidate_variant_tables(wildcards):
         sample=sample_ids,
     )
 
+rule:
+    input:
+        candidate_variant_tables
+    output:
+        temp(touch('results/{species}/variants.done'))
+    localrule: True
+
 
 rule create_variants_db:
     input:
-        candidate_variant_tables
+        expand(
+            'results/{species}/variants.done',
+            species=config['wildcards']['species'].split('|')
+        )
     params:
-        af_glob="'results/{species}/variants/*_af.tsv'",
+        af_glob="'results/*/variants/*_af.tsv'",
     output:
-        'results/{species}/variants/candidate_variants.duckdb',
+        'results/variants.duckdb',
     resources:
         cpus_per_task=32,
         mem_mb=48_000,
-        runtime=15
-    localrule: False
+        runtime=30
     envmodules:
         'duckdb/nightly'
     shell:
@@ -52,13 +61,3 @@ rule create_variants_db:
         
         duckdb {output} -c ".read workflow/scripts/create_variants_db.sql"
         '''
-
-rule:
-    input:
-        expand(
-            'results/{species}/variants/candidate_variants.duckdb',
-            species=config['wildcards']['species'].split('|')
-        )
-    output:
-        touch('results/variants.duckdb')
-    localrule: True
