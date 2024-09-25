@@ -44,7 +44,7 @@ use rule bactmap from widevariant as mapping with:
         'jdk/17.0.10'
 
 
-rule:
+rule collect_vcfs:
     """Collect mapping output.
     
     Collect mapping output such that the sample wildcard can be
