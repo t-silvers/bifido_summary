@@ -68,7 +68,7 @@ def species_abundance_output(wildcards):
         pd.read_csv(
             checkpoints.samplesheet.get(
                 **wildcards
-            ).output[0]
+            ).output[1]
         )
         ['sample'].astype(str)
     )
@@ -88,7 +88,7 @@ rule:
     params:
         glob="'results/bracken/*.bracken'"
     output:
-        'results/abundance.duckdb',
+        'results/abundance.duckdb'
     resources:
         cpus_per_task=8,
         mem_mb=4_000,
