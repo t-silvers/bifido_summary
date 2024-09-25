@@ -18,31 +18,28 @@ rule bcftools_query:
 def candidate_variant_tables(wildcards):
     import pandas as pd
 
-    sample_ids = pd.read_csv(
-        checkpoints.mapping_samplesheet.get(
-            species=wildcards.species,
-        ).output[0]
-    )['sample'].astype(str)
-
-    return expand(
-        'results/{{species}}/variants/{sample}_af.tsv',
-        sample=sample_ids,
+    ref_genomes = pd.read_csv(
+        checkpoints.reference_genomes.get(
+            **wildcards
+        ).output[1]
     )
 
-rule:
-    input:
-        candidate_variant_tables
-    output:
-        temp(touch('results/{species}/variants.done'))
-    localrule: True
+    return list(
+        ref_genomes
+        [ref_genomes['taxon'].isin(config['wildcards']['species'].split('|'))]
+        .filter(['sample', 'taxon'])
+        .rename(columns={'taxon': 'species'})
+        .drop_duplicates()
+        .transpose()
+        .apply(lambda df: 'results/{species}/variants/{sample}_af.tsv'.format(**df.to_dict()))
+        .values
+        .flatten()
+    )
 
 
 rule create_variants_db:
     input:
-        expand(
-            'results/{species}/variants.done',
-            species=config['wildcards']['species'].split('|')
-        )
+        candidate_variant_tables
     params:
         af_glob="'results/*/variants/*_af.tsv'",
     output:
