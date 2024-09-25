@@ -3,8 +3,7 @@
 	"wildcards": {
 		"donors": "B001",
 		"relationships": "F|M|B",
-		"species": "Bifidobacterium_adolescentis|Bifidobacterium_bifidum|Bifidobacterium_longum|Enterococcus_faecalis|Escherichia_coli|Staphylococcus_aureus",
-		"time_cat": "vor|2Wochen|4Wochen"
+		"species": "Bifidobacterium_adolescentis|Bifidobacterium_bifidum|Bifidobacterium_longum"
 	},
 	"variants_thresh": {
 		"reads_alt": 3,

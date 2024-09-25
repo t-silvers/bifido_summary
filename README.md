@@ -20,5 +20,11 @@ task -t $GROUP_HOME/tools/lab-tasks smk:run PROJ="bifido_summary" EXTRA=" -n"
 		"relationships": "F|M|B",
 		"species": "Bifidobacterium_adolescentis|Bifidobacterium_bifidum|Bifidobacterium_longum"
 	},
+	"wildcards": {
+		"donors": "B001",
+		"relationships": "F|M|B",
+		"species": "Bifidobacterium_adolescentis|Bifidobacterium_bifidum|Bifidobacterium_longum|Enterococcus_faecalis|Escherichia_coli|Staphylococcus_aureus",
+		"time_cat": "vor|2Wochen|4Wochen"
+	},
 
 ```
