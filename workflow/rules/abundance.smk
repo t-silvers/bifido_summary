@@ -3,7 +3,7 @@ def paired_fastqs(wildcards):
 
     return (
         pd.read_csv(
-            checkpoints.samplesheet.get(**wildcards).output[0]
+            checkpoints.samplesheet.get(**wildcards).output[1]
         )
         .query(
             f"sample == {wildcards['sample']}"
@@ -88,7 +88,7 @@ rule:
     params:
         glob="'results/bracken/*.bracken'"
     output:
-        'results/abundance.duckdb'
+        'results/abundance.duckdb',
     resources:
         cpus_per_task=8,
         mem_mb=4_000,

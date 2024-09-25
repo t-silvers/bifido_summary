@@ -28,32 +28,32 @@ from read_csv(
 
 -- TODO: Add metadata on calling, code, etc.
 
-select 
-	"sample"
-	, "name"
-from abundance 
-inner join (
-	select 
-		"sample"
-		, max(fraction_total_reads) as mftr 
-	from abundance 
-	group by "sample"
-) m 
-on abundance.sample = m.sample 
-and abundance.fraction_total_reads = m.mftr 
-order by m.mftr;
+-- select 
+-- 	"sample"
+-- 	, "name"
+-- from abundance 
+-- inner join (
+-- 	select 
+-- 		"sample"
+-- 		, max(fraction_total_reads) as mftr 
+-- 	from abundance 
+-- 	group by "sample"
+-- ) m 
+-- on abundance.sample = m.sample 
+-- and abundance.fraction_total_reads = m.mftr 
+-- order by m.mftr;
 
--- Get reference genome taxa
-select distinct on("name") "name"
-from abundance 
-inner join (
-	select 
-		"sample"
-		, max(fraction_total_reads) as mftr 
-	from abundance 
-	where "name" != 'Homo sapiens'
-	group by "sample"
-) m 
- on abundance.sample = m.sample 
-	and abundance.fraction_total_reads = m.mftr 
-order by m.mftr;
+-- -- Get reference genome taxa
+-- select distinct on("name") "name"
+-- from abundance 
+-- inner join (
+-- 	select 
+-- 		"sample"
+-- 		, max(fraction_total_reads) as mftr 
+-- 	from abundance 
+-- 	where "name" != 'Homo sapiens'
+-- 	group by "sample"
+-- ) m 
+--  on abundance.sample = m.sample 
+-- 	and abundance.fraction_total_reads = m.mftr 
+-- order by m.mftr;
