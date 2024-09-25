@@ -1,4 +1,4 @@
-rule:
+rule bcftools_query:
     input:
         'results/{species}/variants/{sample}.vcf.gz',
     output:
@@ -31,7 +31,7 @@ def candidate_variant_tables(wildcards):
     )
 
 
-rule:
+rule create_variants_db:
     input:
         candidate_variant_tables
     params:
