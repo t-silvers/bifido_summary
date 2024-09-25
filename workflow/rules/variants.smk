@@ -6,7 +6,6 @@ rule bcftools_query:
     resources:
         cpus_per_task=2,
         runtime=5
-    localrule: False
     envmodules:
         'bcftools/1.20'
     shell:
