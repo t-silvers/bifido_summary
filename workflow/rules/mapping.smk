@@ -11,13 +11,19 @@ checkpoint mapping_samplesheet:
         samplesheet = pd.read_csv(input[0])
         ref_genomes = pd.read_csv(input[1])
         
-        (
+        mapping_samplesheet = (
             ref_genomes
             [ref_genomes['taxon'] == wildcards.species]
             .merge(samplesheet, on='sample')
             .filter(['sample', 'fastq_1', 'fastq_2'])
-            .to_csv(output[0], index=False)
         )
+
+        exclude = [313]
+        mapping_samplesheet = mapping_samplesheet[
+            ~mapping_samplesheet['sample'].astype(int).isin(exclude)
+        ]
+
+        mapping_samplesheet.to_csv(output[0], index=False)
 
 
 use rule bactmap from widevariant as mapping with:
