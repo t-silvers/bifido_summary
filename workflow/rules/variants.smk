@@ -24,6 +24,11 @@ def candidate_variant_tables(wildcards):
         ).output[1]
     )
 
+    exclude = [313] # TODO
+    ref_genomes = ref_genomes[
+        ~ref_genomes['sample'].astype(int).isin(exclude)
+    ]
+
     return list(
         ref_genomes
         [ref_genomes['taxon'].isin(config['wildcards']['species'].split('|'))]
