@@ -28,15 +28,14 @@ wildcard_constraints:
     donors=config['wildcards']['donors'],
     relationships=config['wildcards']['relationships'],
     species=config['wildcards']['species'],
-    time_cat=config['wildcards']['time_cat']
+    # time_cat=config['wildcards']['time_cat']
 
 
 rule all:
     input:
         multiext('results/samplesheet', '.duckdb', '.csv'),
         'results/abundance.duckdb',
-        # 'results/samplesheet.done',
-        # 'results/samplesheet.duckdb',
+        'results/variants.duckdb',
         # 'results/phylogenies.done',
     localrule: True
     default_target: True

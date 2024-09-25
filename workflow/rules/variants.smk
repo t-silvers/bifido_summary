@@ -51,3 +51,13 @@ rule:
                BCFTOOLS_QUERY={params.af_glob}
         duckdb {output} -c ".read workflow/scripts/create_variants_db.sql"
         '''
+
+rule:
+    input:
+        expand(
+            'results/{species}/variants/candidate_variants.duckdb',
+            species=config['wildcards']['species'].split('|')
+        )
+    output:
+        touch('results/variants.duckdb')
+    localrule: True

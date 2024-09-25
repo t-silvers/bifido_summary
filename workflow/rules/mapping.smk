@@ -1,21 +1,20 @@
 checkpoint mapping_samplesheet:
     input:
-        'results/samplesheet.csv'
+        'results/samplesheet.csv',
+        'results/reference_genomes.csv'
     output:
-        'results/{species}/samplesheet.csv'
+        'results/{species}/mapping_samplesheet.csv'
     localrule: True
     run:
         import pandas as pd
 
         samplesheet = pd.read_csv(input[0])
-
-        if wildcards.species == 'Control':
-            species_mask = samplesheet['species'].isna()
-        else:
-            species_mask = samplesheet['species'] == wildcards.species
-
+        ref_genomes = pd.read_csv(input[1])
+        
         (
-            samplesheet[species_mask]
+            ref_genomes
+            [ref_genomes['taxon'] == wildcards.species]
+            .merge(samplesheet, on='sample')
             .filter(['sample', 'fastq_1', 'fastq_2'])
             .to_csv(output[0], index=False)
         )
@@ -23,7 +22,7 @@ checkpoint mapping_samplesheet:
 
 use rule bactmap from widevariant as mapping with:
     input:
-        input='results/{species}/samplesheet.csv',
+        input='results/{species}/mapping_samplesheet.csv',
         reference=lambda wildcards: config['public_data']['reference'][wildcards.species],
     params:
         pipeline='bactmap',

@@ -82,13 +82,14 @@ def species_abundance_output(wildcards):
     )
 
 
-rule:
+checkpoint reference_genomes:
     input:
         species_abundance_output
     params:
-        glob="'results/bracken/*.bracken'"
+        bracken_glob="'results/bracken/*.bracken'"
     output:
-        'results/abundance.duckdb'
+        'results/abundance.duckdb',
+        'results/reference_genomes.csv'
     resources:
         cpus_per_task=8,
         mem_mb=4_000,
@@ -97,6 +98,12 @@ rule:
         'duckdb/nightly'
     shell:
         '''
-        export MEMORY_LIMIT="$(({resources.mem_mb} / 1000))GB" BRACKEN_GLOB={params.glob}
-        duckdb {output} -c ".read workflow/scripts/create_abundance_db.sql"
+        export MEMORY_LIMIT="$(({resources.mem_mb} / 1000))GB" \
+               BRACKEN_GLOB={params.bracken_glob}
+        
+        duckdb -init workflow/scripts/create_abundance_db.sql {output[0]} \
+            -c ".read workflow/scripts/parse_abundance_taxa.sql"
+
+        duckdb -csv -init workflow/scripts/parse_abundance_taxa.sql {output[0]} \
+            -c "set enable_progress_bar = false; copy reference_genomes to '/dev/stdout';" > {output[1]}
         '''
