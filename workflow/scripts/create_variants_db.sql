@@ -44,7 +44,8 @@ from read_csv(
 	nullstr = '.',
 	auto_detect = false
 )
-where strlen(alt) >= 1;
+-- where strlen(alt) >= 1;
+;
 
 create type chroms as enum (
     select distinct(chrom) from candidate_variant_tbl

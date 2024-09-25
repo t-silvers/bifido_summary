@@ -35,7 +35,7 @@ rule all:
     input:
         multiext('results/samplesheet', '.duckdb', '.csv'),
         'results/abundance.duckdb',
-        'results/variants.duckdb',
+        'results/all_variants.duckdb',
         # 'results/phylogenies.done',
     localrule: True
     default_target: True

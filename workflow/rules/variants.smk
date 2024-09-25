@@ -48,7 +48,7 @@ rule create_variants_db:
     params:
         af_glob="'results/*/variants/*_af.tsv'",
     output:
-        'results/variants.duckdb',
+        'results/all_variants.duckdb',
     resources:
         cpus_per_task=32,
         mem_mb=48_000,
