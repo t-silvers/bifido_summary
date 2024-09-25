@@ -2,7 +2,7 @@ rule:
     input:
         'results/{species}/variants/{sample}.vcf.gz',
     output:
-        temp('results/{species}/variants/{sample}_af.tsv')
+        'results/{species}/variants/{sample}_af.tsv'
     resources:
         cpus_per_task=2,
         runtime=5
@@ -49,6 +49,7 @@ rule:
         '''
         export MEMORY_LIMIT="$(({resources.mem_mb} / 1000))GB" \
                BCFTOOLS_QUERY={params.af_glob}
+        
         duckdb {output} -c ".read workflow/scripts/create_variants_db.sql"
         '''
 

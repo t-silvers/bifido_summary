@@ -18,7 +18,7 @@ checkpoint mapping_samplesheet:
             .filter(['sample', 'fastq_1', 'fastq_2'])
         )
 
-        exclude = [313]
+        exclude = [313] # TODO
         mapping_samplesheet = mapping_samplesheet[
             ~mapping_samplesheet['sample'].astype(int).isin(exclude)
         ]

@@ -7,7 +7,7 @@
 	},
 	"variants_thresh": {
 		"reads_alt": 3,
-		"coverage": 20,
+		"coverage": 5,
 		"interpos_dist": 500,
 		"maf": ".95",
 		"qual": 30
