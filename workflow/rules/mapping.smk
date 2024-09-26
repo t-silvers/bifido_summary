@@ -52,7 +52,7 @@ rule collect_vcfs:
     resolved by downstream rules.
     """
     input:
-        'results/{species}/pipeline_info/pipeline_report.txt',
+        ancient('results/{species}/pipeline_info/pipeline_report.txt'),
     output:
         touch('results/{species}/variants/{sample}.vcf.gz'),
     localrule: True
