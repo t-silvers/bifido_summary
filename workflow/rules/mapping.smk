@@ -1,7 +1,7 @@
 checkpoint mapping_samplesheet:
     input:
-        'results/samplesheet.csv',
-        'results/reference_genomes.csv'
+        ancient('results/samplesheet.csv'),
+        ancient('results/reference_genomes.csv')
     output:
         'results/{species}/mapping_samplesheet.csv'
     localrule: True
