@@ -28,7 +28,7 @@ checkpoint mapping_samplesheet:
 
 use rule bactmap from widevariant as mapping with:
     input:
-        input='results/{species}/mapping_samplesheet.csv',
+        input=ancient('results/{species}/mapping_samplesheet.csv'),
         reference=lambda wildcards: config['public_data']['reference'][wildcards.species],
     params:
         pipeline='bactmap',
