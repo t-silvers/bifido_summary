@@ -36,11 +36,8 @@ use rule bactmap from widevariant as mapping with:
         nxf='-work-dir results/{species}/work -config ' + config['bactmap_cfg'],
         outdir='results/{species}',
     output:
-        multiext(
-            'results/{species}/',
-            'pipeline_info/pipeline_report.txt',
-            'multiqc/multiqc_data/multiqc_fastp.yaml'
-        )
+        'results/{species}/pipeline_info/pipeline_report.txt',
+        'results/{species}/multiqc/multiqc_data/multiqc_fastp.yaml',
     localrule: True
     envmodules:
         'apptainer/1.3.2',
