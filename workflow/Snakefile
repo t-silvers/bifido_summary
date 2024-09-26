@@ -30,6 +30,8 @@ wildcard_constraints:
     species=config['wildcards']['species'],
 
 
+EXCLUDE = [313, 324] # TODO
+
 DBS = [
     'samplesheet',
     'abundance',
