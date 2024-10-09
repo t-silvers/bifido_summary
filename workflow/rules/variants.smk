@@ -30,15 +30,16 @@ rule create_data_lake:
 def candidate_variant_tables(wildcards):
     import pandas as pd
 
-    ref_genomes = pd.read_csv(
-        checkpoints.reference_genomes.get(
-            **wildcards
-        ).output[1]
+    ref_genomes = (
+        pd.read_csv(
+            checkpoints.reference_genomes.get(
+                **wildcards
+            ).output[1]
+        )
+        .assign(sample=lambda df: df['sample'].astype(int))
+        .query('sample != @EXCLUDE')
+        .query('sample != @INDEX_SWAPPED')
     )
-
-    ref_genomes = ref_genomes[
-        ~ref_genomes['sample'].astype(int).isin(EXCLUDE)
-    ]
 
     return list(
         ref_genomes

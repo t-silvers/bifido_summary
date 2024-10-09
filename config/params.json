@@ -6,11 +6,12 @@
 		"species": "Bifidobacterium_adolescentis|Bifidobacterium_bifidum|Bifidobacterium_longum|Enterococcus_faecalis|Escherichia_coli"
 	},
 	"variants_thresh": {
+		"base_qual": 30,
 		"reads_alt": 3,
-		"coverage": 5,
+		"coverage": 20,
 		"interpos_dist": 500,
 		"maf": ".95",
 		"qual": 30
-	},
-	"run_id": "20240921_bifido_all"
+	  },
+	"run_id": "20241009_bifido_all"
 }

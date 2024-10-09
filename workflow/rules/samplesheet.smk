@@ -29,10 +29,10 @@ rule:
 checkpoint samplesheet:
     input:
         'results/raw_sample_info.xlsx'
-    params:
-        data_glob=f"'{config['data']['directory']}*.fastq.gz'"
     output:
         multiext('results/samplesheet', '.duckdb', '.csv')
+    params:
+        data_glob=f"'{config['data']['directory']}*.fastq.gz'"
     localrule: True
     envmodules:
         'duckdb/1.0'
