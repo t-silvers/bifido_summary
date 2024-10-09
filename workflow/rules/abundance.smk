@@ -98,7 +98,7 @@ checkpoint reference_genomes:
         'duckdb/nightly'
     shell:
         '''
-        export MEMORY_LIMIT="$(({resources.mem_mb} / 1000))GB" \
+        export MEMORY_LIMIT="$(({resources.mem_mb} / 1100))GB" \
                BRACKEN_GLOB={params.bracken_glob}
         
         duckdb -init workflow/scripts/create_abundance_db.sql {output[0]} \

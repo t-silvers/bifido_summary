@@ -1,17 +1,29 @@
-rule bcftools_query:
+rule create_data_lake:
     input:
-        'results/{species}/variants/{sample}.vcf.gz',
+        ancient('results/{species}/variants/{sample}.vcf.gz'),
     output:
-        'results/{species}/variants/{sample}_af.tsv'
+        multiext(
+            'results/lake/species={species}/sample={sample}/',
+            'indel.parquet',
+            'snp.parquet',
+            'nonindels.parquet',
+        )
     resources:
-        cpus_per_task=2,
+        cpus_per_task=4,
         runtime=5
     envmodules:
-        'bcftools/1.20'
+        'bcftools/1.20',
+        'vcf2parquet/0.4.1'
     shell:
         '''
-        bcftools +fill-tags {input} -- -t AF | \
-        bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%SAMPLE]\t%QUAL\t%DP\t%INFO/DP4\n' > {output}
+        bcftools view -i 'INFO/INDEL=1' {input} |\
+          vcf2parquet -i /dev/stdin convert -o {output[0]}
+
+        bcftools view -i 'TYPE="SNP"' {input} |\
+          vcf2parquet -i /dev/stdin convert -o {output[1]}
+
+        bcftools view -e 'INFO/INDEL=1' {input} |\
+          vcf2parquet -i /dev/stdin convert -o {output[2]}
         '''
 
 
@@ -35,7 +47,7 @@ def candidate_variant_tables(wildcards):
         .rename(columns={'taxon': 'species'})
         .drop_duplicates()
         .transpose()
-        .apply(lambda df: 'results/{species}/variants/{sample}_af.tsv'.format(**df.to_dict()))
+        .apply(lambda df: 'results/lake/species={species}/sample={sample}/nonindels.parquet'.format(**df.to_dict()))
         .values
         .flatten()
     )
@@ -44,20 +56,20 @@ def candidate_variant_tables(wildcards):
 rule create_variants_db:
     input:
         candidate_variant_tables
-    params:
-        af_glob="'results/*/variants/*_af.tsv'",
     output:
-        'results/all_variants.duckdb',
+        'results/candidate_variants.duckdb',
+    params:
+        vcfs="'results/lake/*/*/nonindels.parquet'",
     resources:
         cpus_per_task=32,
-        mem_mb=48_000,
-        runtime=30
+        mem_mb=96_000,
+        runtime=90
     envmodules:
         'duckdb/nightly'
     shell:
         '''
-        export MEMORY_LIMIT="$(({resources.mem_mb} / 1000))GB" \
-               BCFTOOLS_QUERY={params.af_glob}
+        export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB" \
+               VCFS={params.vcfs}
         
         duckdb {output} -c ".read workflow/scripts/create_variants_db.sql"
         '''

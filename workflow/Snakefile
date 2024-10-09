@@ -35,7 +35,8 @@ EXCLUDE = [313, 324] # TODO
 DBS = [
     'samplesheet',
     'abundance',
-    'all_variants',
+    'candidate_variants',
+    # 'all_variants',
     'total_reads',
 ]
 
@@ -55,3 +56,8 @@ onstart:
 onsuccess:
     shell(f'mkdir -p "/r/t/thosi/{config['run_id']}"')
     shell(f'rsync -au --progress config "/r/t/thosi/{config['run_id']}/"')
+
+    # Clean up compiled report
+    shell(f'rm -f "report/main.{config['run_id']}.$(date +"%Y%m%d").pdf"')
+    shell(f'touch report/main.pdf')
+    shell(f'mv report/main.pdf "report/main.{config['run_id']}.$(date +"%Y%m%d").pdf"')
