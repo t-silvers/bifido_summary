@@ -6,7 +6,7 @@ min_version('8.11')
 
 
 configfile: os.environ["GROUP_HOME"] + '/config/public_data.json'
-configfile: 'config/my_data.json'
+configfile: 'config/data.json'
 configfile: 'config/params.json'
 
 
@@ -32,7 +32,7 @@ wildcard_constraints:
 
 rule all:
     input:
-        'results/samplesheet.done'
+        'data_lake/indexes/fastqs.parquet'
     localrule: True
     default_target: True
 

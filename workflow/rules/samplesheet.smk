@@ -1,3 +1,22 @@
+rule:
+    output:
+        'data_lake/indexes/fastqs.parquet'
+    params:
+        glob=f"'{config['data']['directory']}*.fastq.gz'"
+        pat=config['data']['pat']
+    localrule: True
+    envmodules:
+        'duckdb/1.0'
+    shell:
+        '''
+        export MEMORY_LIMIT=4GB THREADS=1
+        export FASTQS={params.glob} PAT={params.pat}
+
+        duckdb -c ".read workflow/scripts/collect_fastqs.sql" > {output}
+        '''
+
+# -- select * from read_csv('/ptmp/thosi/bifido_summary/results/raw_seq_info.csv', skip=13) where "Notes (optional)" ilike '%B001%';
+
 for info, exe in zip(['seq_info', 'sample_info'], ['csv', 'xlsx']):
     rule:
         name:
@@ -14,6 +33,7 @@ for info, exe in zip(['seq_info', 'sample_info'], ['csv', 'xlsx']):
         shell:
             'rclone copyto "nextcloud:{params.path}" {output}'
 
+# TODO: re-parse /ptmp/thosi/bifido_summary/results/raw_seq_info.csv
 
 checkpoint samplesheet:
     input:
@@ -41,7 +61,6 @@ checkpoint samplesheet:
         duckdb -csv -init workflow/scripts/create_samplesheet_db.sql {output[0]} \
             -c "set enable_progress_bar = false; copy samplesheet to '/dev/stdout';" > {output[1]}
         '''
-
 
 rule:
     input:
