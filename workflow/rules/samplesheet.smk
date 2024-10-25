@@ -2,8 +2,8 @@ rule:
     output:
         'data_lake/indexes/fastqs.parquet'
     params:
-        glob=f"'{config['data']['directory']}*.fastq.gz'"
-        pat=config['data']['pat']
+        glob=f"'{config['data']['directory']}*.fastq.gz'",
+        pat=config['data']['pat'],
     localrule: True
     envmodules:
         'duckdb/1.0'
