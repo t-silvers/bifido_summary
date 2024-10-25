@@ -1,29 +1,18 @@
-rule:
-    output:
-        'results/raw_seq_info.csv'
-    params:
-        path=config['samplesheet']['seq_info']
-    resources:
-        slurm_partition='datatransfer'
-    localrule: True
-    envmodules:
-        'rclone/1.67.0'
-    shell:
-        'rclone copyto "nextcloud:{params.path}" {output}'
-
-
-rule:
-    output:
-        'results/raw_sample_info.xlsx'
-    params:
-        path=config['samplesheet']['sample_info']
-    resources:
-        slurm_partition='datatransfer'
-    localrule: True
-    envmodules:
-        'rclone/1.67.0'
-    shell:
-        'rclone copyto "nextcloud:{params.path}" {output}'
+for info, exe in zip(['seq_info', 'sample_info'], ['csv', 'xlsx']):
+    rule:
+        name:
+            f'get_{info}'
+        output:
+            f'results/raw_{info}.{exe}'
+        params:
+            path=config['samplesheet'][info]
+        resources:
+            slurm_partition='datatransfer'
+        localrule: True
+        envmodules:
+            'rclone/1.67.0'
+        shell:
+            'rclone copyto "nextcloud:{params.path}" {output}'
 
 
 checkpoint samplesheet:
