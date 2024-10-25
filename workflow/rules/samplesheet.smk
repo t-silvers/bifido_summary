@@ -9,13 +9,25 @@ rule:
         'duckdb/1.0'
     shell:
         '''
-        export MEMORY_LIMIT=4GB THREADS=1
         export FASTQS={params.glob} PAT={params.pat}
 
-        duckdb -c ".read workflow/scripts/collect_fastqs.sql" > {output}
+        duckdb -init config/.duckdbrc \
+          -c ".read workflow/scripts/collect_fastqs.sql" > {output}
         '''
 
-# -- select * from read_csv('/ptmp/thosi/bifido_summary/results/raw_seq_info.csv', skip=13) where "Notes (optional)" ilike '%B001%';
+
+rule:
+    output:
+        'data_lake/indexes/enums.duckdb'
+    localrule: True
+    envmodules:
+        'duckdb/1.0'
+    shell:
+        '''
+        duckdb -init config/.duckdbrc {output} \
+          -c ".read workflow/scripts/create_enums.sql"
+        '''
+
 
 for info, exe in zip(['seq_info', 'sample_info'], ['csv', 'xlsx']):
     rule:
@@ -33,7 +45,32 @@ for info, exe in zip(['seq_info', 'sample_info'], ['csv', 'xlsx']):
         shell:
             'rclone copyto "nextcloud:{params.path}" {output}'
 
-# TODO: re-parse /ptmp/thosi/bifido_summary/results/raw_seq_info.csv
+
+rule:
+    input:
+        enums='data_lake/indexes/enums.duckdb',
+        donors='results/raw_sample_info.xlsx',
+    output:
+        'data_lake/indexes/donors.duckdb'
+    localrule: True
+    envmodules:
+        'duckdb/1.0'
+    shell:
+        '''
+        duckdb -init config/.duckdbrc \
+          -c "attach '{input.enums}' as enums_db (read_only);
+          attach '{output}' as donors_db;
+          copy from database enums_db to donors_db;"
+
+        export SAMPLESHEET="{input.donors}"
+
+        duckdb -init config/.duckdbrc {output} \
+          -c ".read workflow/scripts/parse_donors.sql"
+        '''
+
+
+# TODO: Sequencing metadata
+
 
 checkpoint samplesheet:
     input:
@@ -51,9 +88,6 @@ checkpoint samplesheet:
                SLURM_CPUS_PER_TASK=2 \
                FASTQS_DIR={params.data_glob} \
                SAMPLESHEET="{input}"
-
-        duckdb {output[0]} \
-            -c ".read workflow/scripts/create_fastqs_db.sql"
 
         duckdb -init workflow/scripts/create_types.sql {output[0]} \
             -c ".read workflow/scripts/create_sample_info_db.sql"

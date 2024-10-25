@@ -32,7 +32,7 @@ wildcard_constraints:
 
 rule all:
     input:
-        'data_lake/indexes/fastqs.parquet'
+        'data_lake/indexes/donors.duckdb'
     localrule: True
     default_target: True
 

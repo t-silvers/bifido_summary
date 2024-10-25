@@ -1,8 +1,3 @@
-set memory_limit = getenv('MEMORY_LIMIT');
-set threads = getenv('THREADS');
-
--- NOTE: Controls are dropped.
-
 copy (
     with fastqs as (
         select "file"
@@ -12,6 +7,7 @@ copy (
                 ['library', 'ID', 'read']
             ) as info
         from glob(getenv('FASTQS'))
+        -- NOTE: Controls are dropped.
         where "file" not ilike '%plate%'
     )
     select * 
