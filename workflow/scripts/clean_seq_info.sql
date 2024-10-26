@@ -1,6 +1,6 @@
 -- TODO: Add comments as table metadata
 
-create temp table sequencing as
+create table sequencing as
 select * exclude (ID)
     , ID as original_id
     , case when notes ilike '%failed%' then true 
