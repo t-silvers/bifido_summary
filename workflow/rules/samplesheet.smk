@@ -1,6 +1,6 @@
 rule:
     output:
-        'data_lake/indexes/fastqs.parquet'
+        'data_lake/indexes/fastqs-indexswapped.parquet'
     params:
         glob=f"'{config['data']['directory']}*.fastq.gz'",
         pat=config['data']['pat'],
@@ -49,9 +49,9 @@ for info, exe in zip(['seq_info', 'sample_info'], ['csv', 'xlsx']):
 rule:
     input:
         enums='data_lake/indexes/enums.duckdb',
-        donors='results/raw_sample_info.xlsx',
+        info='results/raw_sample_info.xlsx',
     output:
-        'data_lake/indexes/donors.duckdb'
+        'data_lake/indexes/samples.duckdb'
     localrule: True
     envmodules:
         'duckdb/1.0'
@@ -59,39 +59,62 @@ rule:
         '''
         duckdb -init config/.duckdbrc \
           -c "attach '{input.enums}' as enums_db (read_only);
-          attach '{output}' as donors_db;
-          copy from database enums_db to donors_db;"
+          attach '{output}' as info_db;
+          copy from database enums_db to info_db;"
 
-        export SAMPLESHEET="{input.donors}"
+        export SAMPLE_INFO="{input.info}"
 
         duckdb -init config/.duckdbrc {output} \
-          -c ".read workflow/scripts/parse_donors.sql"
+          -c ".read workflow/scripts/clean_sample_info.sql"
         '''
 
 
-# TODO: Sequencing metadata
-
-
-checkpoint samplesheet:
+rule:
     input:
-        'results/raw_sample_info.xlsx'
+        info='results/raw_seq_info.csv',
     output:
-        multiext('results/samplesheet', '.duckdb', '.csv')
-    params:
-        data_glob=f"'{config['data']['directory']}*.fastq.gz'"
+        'data_lake/indexes/seq.duckdb'
     localrule: True
     envmodules:
         'duckdb/1.0'
     shell:
         '''
-        export MEMORY_LIMIT="8GB" \
-               SLURM_CPUS_PER_TASK=2 \
-               FASTQS_DIR={params.data_glob} \
-               SAMPLESHEET="{input}"
+        export SEQ_INFO="{input.info}"
 
-        duckdb -init workflow/scripts/create_types.sql {output[0]} \
-            -c ".read workflow/scripts/create_sample_info_db.sql"
+        duckdb -init config/.duckdbrc {output} \
+          -c ".read workflow/scripts/clean_seq_info.sql"
+        '''
 
+
+rule:
+    input:
+        'data_lake/indexes/fastqs-indexswapped.parquet',
+        'data_lake/indexes/seq.duckdb',
+    output:
+        'data_lake/indexes/fastqs.parquet'
+    localrule: True
+    envmodules:
+        'duckdb/1.0'
+    shell:
+        '''
+        export FASTQS="{input.info}"
+
+        duckdb -init config/.duckdbrc {output} \
+          -c ".read workflow/scripts/fix_index_swap.sql"
+        '''
+
+
+checkpoint samplesheet:
+    input:
+        fastqs='data_lake/indexes/fastqs.parquet',
+        samples='data_lake/indexes/samples.duckdb'
+    output:
+        'results/samplesheet.csv'
+    localrule: True
+    envmodules:
+        'duckdb/1.0'
+    shell:
+        '''
         duckdb -csv -init workflow/scripts/create_samplesheet_db.sql {output[0]} \
             -c "set enable_progress_bar = false; copy samplesheet to '/dev/stdout';" > {output[1]}
         '''
