@@ -88,8 +88,8 @@ rule:
 
 rule:
     input:
-        'data_lake/indexes/fastqs-indexswapped.parquet',
-        'data_lake/indexes/seq.duckdb',
+        fastqs='data_lake/indexes/fastqs-indexswapped.parquet',
+        seqinfo='data_lake/indexes/seq.duckdb',
     output:
         'data_lake/indexes/fastqs.parquet'
     localrule: True
@@ -97,10 +97,10 @@ rule:
         'duckdb/1.0'
     shell:
         '''
-        export FASTQS="{input.info}"
+        export FASTQS="{input.fastqs}"
 
-        duckdb -init config/.duckdbrc {output} \
-          -c ".read workflow/scripts/fix_index_swap.sql"
+        duckdb -init config/.duckdbrc {input.seqinfo} \
+          -c ".read workflow/scripts/fix_index_swap.sql" > {output}
         '''
 
 
