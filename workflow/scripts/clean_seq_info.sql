@@ -21,5 +21,5 @@ from read_csv(
         'library_prep': varchar,
         'notes': varchar
     },
-    skip = 13
+    skip = 14
 ) ;
