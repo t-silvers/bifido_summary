@@ -32,7 +32,8 @@ wildcard_constraints:
 
 rule all:
     input:
-        'data_lake/indexes/fastqs-indexswapped.parquet'
+        'data_lake/indexes/seq.duckdb',
+        'data_lake/indexes/fastqs-indexswapped.parquet',
     localrule: True
     default_target: True
 
