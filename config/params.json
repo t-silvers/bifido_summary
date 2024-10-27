@@ -1,7 +1,7 @@
 {
 	"bactmap_cfg": "/nexus/posix0/MPIIB-keylab/config/nextflow/bactmap.config",
 	"wildcards": {
-		"ID": "r'B001-\\d+'",
+		"ID": "B001-\\d+",
 		"donors": "B001",
 		"relationships": "F|M|B",
 		"species": "Bifidobacterium_adolescentis|Bifidobacterium_bifidum|Bifidobacterium_longum|Enterococcus_faecalis|Escherichia_coli"
