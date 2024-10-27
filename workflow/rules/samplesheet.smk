@@ -1,23 +1,5 @@
 rule:
     output:
-        'data_lake/indexes/fastqs-indexswapped.parquet'
-    params:
-        glob=f"'{config['data']['directory']}*.fastq.gz'",
-        pat=config['data']['pat'],
-    localrule: True
-    envmodules:
-        'duckdb/1.0'
-    shell:
-        '''
-        export FASTQS={params.glob} PAT={params.pat}
-
-        duckdb -init config/.duckdbrc \
-          -c ".read workflow/scripts/collect_fastqs.sql" > {output}
-        '''
-
-
-rule:
-    output:
         'data_lake/indexes/enums.duckdb'
     localrule: True
     envmodules:
@@ -44,6 +26,24 @@ for info, exe in zip(['seq_info', 'sample_info'], ['csv', 'xlsx']):
             'rclone/1.67.0'
         shell:
             'rclone copyto "nextcloud:{params.path}" {output}'
+
+
+rule:
+    output:
+        'data_lake/indexes/fastqs-indexswapped.csv'
+    params:
+        glob=f"'{config['data']['directory']}*.fastq.gz'",
+        pat=config['data']['pat'],
+    localrule: True
+    envmodules:
+        'duckdb/1.0'
+    shell:
+        '''
+        export DIR={params.glob} PAT={params.pat}
+
+        duckdb -init config/.duckdbrc \
+          -c ".read workflow/scripts/collect_fastqs.sql" > {output}
+        '''
 
 
 rule:
@@ -88,10 +88,10 @@ rule:
 
 rule:
     input:
-        fastqs='data_lake/indexes/fastqs-indexswapped.parquet',
+        fastqs='data_lake/indexes/fastqs-indexswapped.csv',
         seqinfo='data_lake/indexes/seq.duckdb',
     output:
-        'data_lake/indexes/fastqs.parquet'
+        'data_lake/indexes/fastqs.csv'
     localrule: True
     envmodules:
         'duckdb/1.0'
@@ -99,14 +99,15 @@ rule:
         '''
         export FASTQS="{input.fastqs}"
 
-        duckdb -init config/.duckdbrc {input.seqinfo} \
+        duckdb -readonly -init config/.duckdbrc {input.seqinfo} \
           -c ".read workflow/scripts/fix_index_swap.sql" > {output}
         '''
 
 
+# TODO: Must run after kraken2 labeling
 checkpoint samplesheet:
     input:
-        fastqs='data_lake/indexes/fastqs.parquet',
+        fastqs='data_lake/indexes/fastqs.csv',
         samples='data_lake/indexes/samples.duckdb'
     output:
         'results/samplesheet.csv'
@@ -115,8 +116,10 @@ checkpoint samplesheet:
         'duckdb/1.0'
     shell:
         '''
-        duckdb -csv -init workflow/scripts/create_samplesheet_db.sql {output[0]} \
-            -c "set enable_progress_bar = false; copy samplesheet to '/dev/stdout';" > {output[1]}
+        export FASTQS="{input.fastqs}"
+
+        duckdb -csv -readonly -init config/.duckdbrc {input.samples} \
+            -c ".read workflow/scripts/create_mapping_samplesheet.sql" > {output}
         '''
 
 rule:

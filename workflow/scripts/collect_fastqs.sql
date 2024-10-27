@@ -6,7 +6,7 @@ copy (
                 getenv('PAT'),
                 ['library', 'ID', 'read']
             ) as info
-        from glob(getenv('FASTQS'))
+        from glob(getenv('DIR'))
         -- NOTE: Controls are dropped.
         where "file" not ilike '%plate%'
     )
@@ -22,4 +22,4 @@ copy (
         using first("file") 
         group by library, ID
     )
-) to '/dev/stdout' (format parquet);
+) to '/dev/stdout' (format csv);
