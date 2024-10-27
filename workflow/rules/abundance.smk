@@ -35,6 +35,7 @@ rule kraken2:
     shell:
         '''
         export OMP_PLACES=threads
+        
         kraken2 \
           --db {params.db} \
           --threads {resources.cpus_per_task} \
