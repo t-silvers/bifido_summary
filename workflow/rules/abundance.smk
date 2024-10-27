@@ -8,7 +8,7 @@ def paired_fastqs(wildcards):
         # NOTE: Not all FASTQs can be resolved to IDs
         .dropna()
         .query(
-            f"ID == {wildcards['ID']}"
+            f"sample == {wildcards['sample']}"
         )
         .filter(like='fastq', axis=1)
         .values
@@ -20,8 +20,8 @@ rule kraken2:
     input:
         paired_fastqs
     output:
-        'results/kraken2/{ID}.kraken2',
-        'results/kraken2/{ID}.k2report',
+        'results/kraken2/{sample}.kraken2',
+        'results/kraken2/{sample}.k2report',
     params:
         db=config['public_data']['kraken_db'],
     resources:
@@ -50,10 +50,10 @@ rule kraken2:
 
 rule bracken:
     input:
-        'results/kraken2/{ID}.k2report',
+        'results/kraken2/{sample}.k2report',
     output:
-        'results/bracken/{ID}.bracken',
-        'results/bracken/{ID}.breport',
+        'results/bracken/{sample}.bracken',
+        'results/bracken/{sample}.breport',
     params:
         db=config['public_data']['kraken_db'],
     resources:
@@ -67,21 +67,21 @@ rule bracken:
 def abundance_output(wildcards):
     import pandas as pd
 
-    IDs = (
+    sample_ids = (
         pd.read_csv(
             checkpoints.fastqs.get(**wildcards).output[0]
         )
         # NOTE: Not all FASTQs can be resolved to IDs
         .dropna()
-        ['ID'].astype(str)
+        ['sample'].astype(str)
     )
 
     return expand(
         [
-            'results/bracken/{ID}.bracken',
-            'results/bracken/{ID}.breport',
+            'results/bracken/{sample}.bracken',
+            'results/bracken/{sample}.breport',
         ],
-        ID=IDs
+        sample=sample_ids
     )
 
 

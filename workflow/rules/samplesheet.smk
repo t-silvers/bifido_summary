@@ -86,7 +86,7 @@ rule:
         '''
 
 
-checkpoint fastqs:
+rule:
     input:
         fastqs='data_lake/indexes/fastqs-indexswapped.csv',
         seqinfo='data_lake/indexes/seq.duckdb',
@@ -101,6 +101,24 @@ checkpoint fastqs:
 
         duckdb -readonly -init config/.duckdbrc {input.seqinfo} \
           -c ".read workflow/scripts/fix_index_swap.sql" > {output}
+        '''
+
+
+checkpoint fastqs:
+    input:
+        fastqs='data_lake/indexes/fastqs.csv',
+        samples='data_lake/indexes/samples.duckdb'
+    output:
+        'results/samplesheets/kraken_bracken.csv'
+    localrule: True
+    envmodules:
+        'duckdb/1.0'
+    shell:
+        '''
+        export FASTQS="{input.fastqs}"
+
+        duckdb -readonly -init config/.duckdbrc {input.samples} \
+          -c ".read workflow/scripts/create_kraken_bracken_samplesheet.sql" > {output}
         '''
 
 

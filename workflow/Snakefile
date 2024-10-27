@@ -25,7 +25,6 @@ include: 'rules/abundance.smk'
 
 wildcard_constraints:
     sample=r'\d+',
-    # ID=config['wildcards']['ID'],
     donors=config['wildcards']['donors'],
     relationships=config['wildcards']['relationships'],
     species=config['wildcards']['species'],
