@@ -41,7 +41,7 @@ rule:
         '''
         export DIR={params.glob} PAT={params.pat}
 
-        duckdb -init config/.duckdbrc \
+        duckdb -readonly -init config/.duckdbrc \
           -c ".read workflow/scripts/collect_fastqs.sql" > {output}
         '''
 
