@@ -5,6 +5,8 @@ def paired_fastqs(wildcards):
         pd.read_csv(
             checkpoints.fastqs.get(**wildcards).output[0]
         )
+        # NOTE: Not all FASTQs can be resolved to IDs
+        .dropna()
         .query(
             f"ID == {wildcards['ID']}"
         )
@@ -68,6 +70,8 @@ def abundance_output(wildcards):
         pd.read_csv(
             checkpoints.fastqs.get(**wildcards).output[0]
         )
+        # NOTE: Not all FASTQs can be resolved to IDs
+        .dropna()
         ['ID'].astype(str)
     )
 
