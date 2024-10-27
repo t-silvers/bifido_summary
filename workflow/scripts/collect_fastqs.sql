@@ -6,7 +6,7 @@ copy (
                 getenv('PAT'),
                 ['library', 'ID', 'read']
             ) as info
-        from glob(getenv('DIR'))
+        from glob(getenv('GLOB'))
         -- NOTE: Controls are dropped.
         where "file" not ilike '%plate%'
     )

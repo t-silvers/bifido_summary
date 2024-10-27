@@ -39,7 +39,7 @@ rule:
         'duckdb/1.0'
     shell:
         '''
-        export DIR={params.glob} PAT={params.pat}
+        export GLOB={params.glob} PAT={params.pat}
 
         duckdb -init config/.duckdbrc \
           -c ".read workflow/scripts/collect_fastqs.sql" > {output}
@@ -86,7 +86,7 @@ rule:
         '''
 
 
-rule:
+checkpoint fastqs:
     input:
         fastqs='data_lake/indexes/fastqs-indexswapped.csv',
         seqinfo='data_lake/indexes/seq.duckdb',

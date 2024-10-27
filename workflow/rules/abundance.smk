@@ -3,10 +3,10 @@ def paired_fastqs(wildcards):
 
     return (
         pd.read_csv(
-            checkpoints.samplesheet.get(**wildcards).output[1]
+            checkpoints.fastqs.get(**wildcards).output[0]
         )
         .query(
-            f"sample == {wildcards['sample']}"
+            f"ID == {wildcards['ID']}"
         )
         .filter(like='fastq', axis=1)
         .values
@@ -18,8 +18,8 @@ rule kraken2:
     input:
         paired_fastqs
     output:
-        'results/kraken2/{sample}.kraken2',
-        'results/kraken2/{sample}.k2report',
+        'results/kraken2/{ID}.kraken2',
+        'results/kraken2/{ID}.k2report',
     params:
         db=config['public_data']['kraken_db'],
     resources:
@@ -47,10 +47,10 @@ rule kraken2:
 
 rule bracken:
     input:
-        'results/kraken2/{sample}.k2report',
+        'results/kraken2/{ID}.k2report',
     output:
-        'results/bracken/{sample}.bracken',
-        'results/bracken/{sample}.breport',
+        'results/bracken/{ID}.bracken',
+        'results/bracken/{ID}.breport',
     params:
         db=config['public_data']['kraken_db'],
     resources:
@@ -61,30 +61,28 @@ rule bracken:
         'bracken -d {params.db} -r 100 -i {input} -o {output[0]} -w {output[1]}'
 
 
-def species_abundance_output(wildcards):
+def abundance_output(wildcards):
     import pandas as pd
 
-    sample_ids = (
+    IDs = (
         pd.read_csv(
-            checkpoints.samplesheet.get(
-                **wildcards
-            ).output[1]
+            checkpoints.fastqs.get(**wildcards).output[0]
         )
-        ['sample'].astype(str)
+        ['ID'].astype(str)
     )
 
     return expand(
         [
-            'results/bracken/{sample}.bracken',
-            'results/bracken/{sample}.breport',
+            'results/bracken/{ID}.bracken',
+            'results/bracken/{ID}.breport',
         ],
-        sample=sample_ids
+        ID=IDs
     )
 
 
 checkpoint reference_genomes:
     input:
-        species_abundance_output
+        abundance_output
     params:
         bracken_glob="'results/bracken/*.bracken'"
     output:

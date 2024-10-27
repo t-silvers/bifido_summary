@@ -16,7 +16,7 @@ module widevariant:
 
 
 include: 'rules/samplesheet.smk'
-# include: 'rules/abundance.smk'
+include: 'rules/abundance.smk'
 # include: 'rules/mapping.smk'
 # include: 'rules/variants.smk'
 # include: 'rules/phylogeny.smk'
@@ -25,6 +25,7 @@ include: 'rules/samplesheet.smk'
 
 wildcard_constraints:
     sample=r'\d+',
+    ID=r'B001-\d+',
     donors=config['wildcards']['donors'],
     relationships=config['wildcards']['relationships'],
     species=config['wildcards']['species'],
@@ -32,8 +33,7 @@ wildcard_constraints:
 
 rule all:
     input:
-        'data_lake/indexes/fastqs.csv',
-        'data_lake/indexes/samples.duckdb',
+        abundance_output
     localrule: True
     default_target: True
 
