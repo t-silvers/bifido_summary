@@ -17,7 +17,7 @@ module widevariant:
 
 include: 'rules/samplesheet.smk'
 include: 'rules/abundance.smk'
-# include: 'rules/mapping.smk'
+include: 'rules/mapping.smk'
 # include: 'rules/variants.smk'
 # include: 'rules/phylogeny.smk'
 # include: 'rules/prepare_results.smk'
@@ -32,7 +32,7 @@ wildcard_constraints:
 
 rule all:
     input:
-        abundance_output
+        'data_lake/indexes/abundance.duckdb'
     localrule: True
     default_target: True
 

@@ -85,6 +85,55 @@ def abundance_output(wildcards):
     )
 
 
+rule:
+    input:
+        abundance_output
+    output:
+        'data_lake/indexes/abundance.duckdb',
+    params:
+        glob="'results/bracken/*.bracken'"
+    resources:
+        cpus_per_task=8,
+        mem_mb=4_000,
+        runtime=15
+    envmodules:
+        'duckdb/nightly'
+    shell:
+        '''
+        export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB"
+        export GLOB={params.glob}
+        
+        duckdb -init config/.duckdbrc {output} \
+          -c ".read workflow/scripts/clean_bracken_output.sql"
+        '''
+
+
+checkpoint reference_genomes:
+    input:
+        'data_lake/indexes/abundance.duckdb',
+        'data_lake/indexes/samples.duckdb'
+    output:
+        'results/samplesheets/reference_genomes.csv'
+    localrule: True
+    envmodules:
+        'duckdb/nightly'
+    shell:
+        '''
+        python match_reference_genome.py
+
+        export ABUNDANCE_DB="{output[0]}"
+        export SAMPLES_DB="{output[1]}"
+
+        duckdb -init config/.duckdbrc data_lake/indexes/samples.duckdb \
+          -c 'copy (select "sample", taxon from samples) to "/dev/stdout" (format csv);' |\
+        duckdb -init config/.duckdbrc data_lake/indexes/abundance.duckdb \
+          -c 'copy (select "sample", taxon from read_csv("/dev/stdin")) to "/dev/stdout" (format csv);'
+
+        duckdb -init config/.duckdbrc {input} \
+            -c ".read workflow/scripts/match_reference_genome.sql" > {output}
+        '''
+
+
 checkpoint reference_genomes:
     input:
         abundance_output
