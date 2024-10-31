@@ -115,8 +115,8 @@ checkpoint reference_genomes:
     output:
         'results/samplesheets/reference_genomes.csv'
     params:
-        read_frac=.5,
-        read_pow=3,
+        read_frac=config['mapping']['min_frac_ref'],
+        read_pow=config['mapping']['min_pow_ref'],
     localrule: True
     envmodules:
         'duckdb/nightly'

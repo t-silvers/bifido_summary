@@ -32,7 +32,10 @@ wildcard_constraints:
 
 rule all:
     input:
-        'results/samplesheets/reference_genomes.csv'
+        expand(
+            'results/{species}/pipeline_info/pipeline_report.txt',
+            species=config['wildcards']['species'].split('|')
+        )
     localrule: True
     default_target: True
 
