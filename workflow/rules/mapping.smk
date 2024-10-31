@@ -1,9 +1,9 @@
 checkpoint mapping_samplesheet:
     input:
-        ancient('results/samplesheet.csv'),
-        ancient('results/reference_genomes.csv')
+        'data_lake/indexes/fastqs.csv',
+        'results/samplesheets/reference_genomes.csv',
     output:
-        'results/{species}/mapping_samplesheet.csv'
+        'results/samplesheets/mapping.{species}.csv'
     localrule: True
     run:
         import pandas as pd
