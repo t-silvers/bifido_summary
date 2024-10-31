@@ -16,7 +16,9 @@ where (s.taxon = 'Enterococcus_faecalis' and a.name ilike 'Enterococcus%')
 copy (
     select 
         "sample"
-        , "name" as species
+        , regexp_replace(
+            trim("name"), ' ', '_', 'g'
+        ) as species
         , new_est_reads
         , fraction_total_reads
     from joined

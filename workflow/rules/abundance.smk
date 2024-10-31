@@ -114,12 +114,15 @@ checkpoint reference_genomes:
         abundance='data_lake/indexes/abundance.duckdb',
     output:
         'results/samplesheets/reference_genomes.csv'
+    params:
+        read_frac=.5,
+        read_pow=3,
     localrule: True
     envmodules:
         'duckdb/nightly'
     shell:
         '''
-        export READ_POW=3 READ_FRAC=".5"
+        export READ_FRAC={params.read_frac} READ_POW={params.read_pow}
 
         duckdb -readonly -init config/.duckdbrc {input.samples} \
           -c 'copy (select "sample", taxon from samples) to "/dev/stdout" (format csv);' |\
