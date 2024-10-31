@@ -8,7 +8,7 @@ checkpoint mapping_samplesheet:
     run:
         import pandas as pd
 
-        fastqs, refs = pd.read_csv(input[0]), pd.read_csv(input[1])
+        fastqs, ref_genomes = pd.read_csv(input[0]), pd.read_csv(input[1])
         
         (
             ref_genomes
