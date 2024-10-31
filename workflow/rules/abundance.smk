@@ -108,6 +108,26 @@ rule:
         '''
 
 
+checkpoint reference_genomes:
+    input:
+        samples='data_lake/indexes/samples.duckdb',
+        abundance='data_lake/indexes/abundance.duckdb',
+    output:
+        'results/samplesheets/reference_genomes.csv'
+    localrule: True
+    envmodules:
+        'duckdb/nightly'
+    shell:
+        '''
+        export READ_POW=3 READ_FRAC=".5"
+
+        duckdb -readonly -init config/.duckdbrc {input.samples} \
+          -c 'copy (select "sample", taxon from samples) to "/dev/stdout" (format csv);' |\
+        duckdb -readonly -init config/.duckdbrc {input.abundance} \
+          -c ".read workflow/scripts/match_reference_genome.sql" > {output}
+        '''
+
+
 # checkpoint reference_genomes:
 #     input:
 #         'data_lake/indexes/abundance.duckdb',

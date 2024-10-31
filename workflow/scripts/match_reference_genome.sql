@@ -1,33 +1,26 @@
-attach 'data_lake/indexes/abundance.duckdb' as adb (readonly);
-
-attach 'data_lake/indexes/samples.duckdb' as sdb (readonly);
-
-create table reference_genomes as
-with obs_taxon as (
-    select *
-        , regexp_replace(
-            trim(abundance.name), ' ', '_', 'g'
-        ) as taxon_raw
-    from abundance 
-    inner join (
-        select 
-            "sample"
-            , max(fraction_total_reads) as max_frac 
-        from abundance 
-        where "name" != 'Homo sapiens'
-        group by "sample"
-    ) obs_max 
-    on 
-        abundance.sample = obs_max.sample 
-    and abundance.fraction_total_reads = obs_max.max_frac 
+with joined as (
+    select 
+        a.sample
+        , a.name
+        , a.new_est_reads
+        , a.fraction_total_reads
+    from read_csv('/dev/stdin') s
+    inner join abundance a
+            on s.sample = a.sample
+    where (s.taxon = 'Enterococcus_faecalis' and a.name ilike 'Enterococcus%')
+       or (s.taxon = 'Escherichia_coli' and a.name ilike 'Escherichia%')
+       or (s.taxon = 'Staphylococcus_aureus' and a.name ilike 'Staphylococcus%')
+       or (s.taxon = 'Bifidobacterium_spp' and a.name ilike 'Bifidobacterium%')
 )
-select 
-    "sample"
-    , try_cast(
-        coalesce(
-            taxon_ref.taxon, obs_taxon.taxon_raw
-        ) as bacteria_taxon
-    ) as taxon
-from obs_taxon
-left join taxon_ref
-on taxon_ref.taxon_raw = obs_taxon.taxon_raw;
+select "sample", "name" as species, new_est_reads, fraction_total_reads
+from joined
+where ("sample", fraction_total_reads) in (
+    select ("sample", max(fraction_total_reads)) 
+    from joined
+    -- where new_est_reads > pow(10, 3)
+    --   and fraction_total_reads > .5
+    where new_est_reads > pow(10, cast(getenv('READ_POW') as int))
+      and fraction_total_reads > cast(getenv('READ_FRAC') as float)
+    group by "sample"
+)
+order by cast("sample" as int);

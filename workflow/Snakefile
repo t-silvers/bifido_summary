@@ -32,7 +32,7 @@ wildcard_constraints:
 
 rule all:
     input:
-        'data_lake/indexes/abundance.duckdb'
+        'results/samplesheets/reference_genomes.csv'
     localrule: True
     default_target: True
 
