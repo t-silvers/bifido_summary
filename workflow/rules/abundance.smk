@@ -124,7 +124,7 @@ checkpoint reference_genomes:
         duckdb -readonly -init config/.duckdbrc {input.samples} \
           -c 'copy (select "sample", taxon from samples) to "/dev/stdout" (format csv);' |\
         duckdb -readonly -init config/.duckdbrc {input.abundance} \
-          -c ".read workflow/scripts/match_reference_genome.sql" > {output}
+          -c '.read workflow/scripts/match_reference_genome.sql' > {output}
         '''
 
 
