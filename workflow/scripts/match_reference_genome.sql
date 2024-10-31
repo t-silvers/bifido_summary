@@ -1,6 +1,7 @@
 create temp table joined as
 select 
     a.sample
+    , s.ID
     , a.name
     , a.new_est_reads
     , a.fraction_total_reads
