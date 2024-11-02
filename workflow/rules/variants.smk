@@ -2,7 +2,7 @@ rule hive_partition_vcfs:
     input:
         ancient('results/{species}/variants/{sample}.vcf.gz'),
     output:
-        touch('data_lake/logs/vcfs.species={species}.sample={sample}.done'),
+        'data_lake/logs/vcfs.species={species}.sample={sample}.done'
     params:
         prefix='data_lake/variants/species={species}/sample={sample}'
     resources:
@@ -23,6 +23,8 @@ rule hive_partition_vcfs:
               vcf2parquet -i /dev/stdin convert -o "{params.prefix}/INDEL=$indel/DP=$dp/data.parquet"
           done
         done
+
+        touch {output} # Not source why using `touch()` in output not working ...
         '''
 
 
