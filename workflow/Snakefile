@@ -18,7 +18,7 @@ module widevariant:
 include: 'rules/samplesheet.smk'
 include: 'rules/abundance.smk'
 include: 'rules/mapping.smk'
-# include: 'rules/variants.smk'
+include: 'rules/variants.smk'
 # include: 'rules/phylogeny.smk'
 # include: 'rules/prepare_results.smk'
 
@@ -29,11 +29,10 @@ wildcard_constraints:
     relationships=config['wildcards']['relationships'],
     species=config['wildcards']['species'],
 
-
 rule all:
     input:
         expand(
-            'results/{species}/pipeline_info/pipeline_report.txt',
+            'logs/cmt.{species}.done',
             species=config['wildcards']['species'].split('|')
         )
     localrule: True

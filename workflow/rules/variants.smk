@@ -1,13 +1,10 @@
-rule create_data_lake:
+rule hive_partition_vcfs:
     input:
         ancient('results/{species}/variants/{sample}.vcf.gz'),
     output:
-        multiext(
-            'results/lake/species={species}/sample={sample}/',
-            'indel.parquet',
-            'snp.parquet',
-            'nonindels.parquet',
-        )
+        touch('data_lake/logs/vcfs.species={species}.sample={sample}.done'),
+    params:
+        prefix='data_lake/variants/species={species}/sample={sample}'
     resources:
         cpus_per_task=4,
         runtime=5
@@ -16,61 +13,64 @@ rule create_data_lake:
         'vcf2parquet/0.4.1'
     shell:
         '''
-        bcftools view -i 'INFO/INDEL=1' {input} |\
-          vcf2parquet -i /dev/stdin convert -o {output[0]}
+        mkdir -p {params.prefix}
 
-        bcftools view -i 'TYPE="SNP"' {input} |\
-          vcf2parquet -i /dev/stdin convert -o {output[1]}
-
-        bcftools view -e 'INFO/INDEL=1' {input} |\
-          vcf2parquet -i /dev/stdin convert -o {output[2]}
+        for indel in 0 1; do
+          for dp in 2 3 4 5 6 7; do
+            echo "{params.prefix}/INDEL=$indel/DP=$dp/vcf.parquet"
+            bcftools view -i 'INFO/INDEL='"$indel"' & (SUM(INFO/ADF)<'"$((dp+1))"' | SUM(INFO/ADR)<'"$((dp+1))"') & SUM(INFO/ADF)>='"$dp"' & SUM(INFO/ADR)>='"$dp" {input} |\
+              vcf2parquet -i /dev/stdin convert -o "{params.prefix}/INDEL=$indel/DP=$dp/data.parquet"
+          done
+        done
         '''
 
 
 def candidate_variant_tables(wildcards):
     import pandas as pd
 
-    ref_genomes = (
+    sample_ids = (
         pd.read_csv(
-            checkpoints.reference_genomes.get(
-                **wildcards
-            ).output[1]
+            checkpoints.mapping_samplesheet.get(
+                species=wildcards.species
+            ).output[0]
         )
-        .assign(sample=lambda df: df['sample'].astype(int))
-        .query('sample != @EXCLUDE')
-        .query('sample != @INDEX_SWAPPED')
+        ['sample']
     )
 
-    return list(
-        ref_genomes
-        [ref_genomes['taxon'].isin(config['wildcards']['species'].split('|'))]
-        .filter(['sample', 'taxon'])
-        .rename(columns={'taxon': 'species'})
-        .drop_duplicates()
-        .transpose()
-        .apply(lambda df: 'results/lake/species={species}/sample={sample}/nonindels.parquet'.format(**df.to_dict()))
-        .values
-        .flatten()
+    return expand(
+        'data_lake/logs/vcfs.species={{species}}.sample={sample}.done',
+        sample=sample_ids
     )
 
 
-rule create_variants_db:
+rule:
     input:
         candidate_variant_tables
     output:
-        'results/candidate_variants.duckdb',
-    params:
-        vcfs="'results/lake/*/*/nonindels.parquet'",
-    resources:
-        cpus_per_task=32,
-        mem_mb=96_000,
-        runtime=90
-    envmodules:
-        'duckdb/nightly'
-    shell:
-        '''
-        export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB" \
-               VCFS={params.vcfs}
+        touch('logs/cmt.{species}.done')
+    localrule: True
+
+
+# rule create_variants_db:
+#     input:
+#         expand(
+#             'logs/cmt.{species}.done',
+#             species=config['wildcards']['species'].split('|')
+#         )
+#     output:
+#         'results/candidate_variants.duckdb',
+#     params:
+#         vcfs="'results/lake/*/*/nonindels.parquet'",
+#     resources:
+#         cpus_per_task=32,
+#         mem_mb=96_000,
+#         runtime=90
+#     envmodules:
+#         'duckdb/nightly'
+#     shell:
+#         '''
+#         export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB" \
+#                VCFS={params.vcfs}
         
-        duckdb {output} -c ".read workflow/scripts/create_variants_db.sql"
-        '''
+#         duckdb {output} -c ".read workflow/scripts/create_variants_db.sql"
+#         '''
