@@ -13,11 +13,12 @@ rule hive_partition_vcfs:
         'vcf2parquet/0.4.1'
     shell:
         '''
-        mkdir -p {params.prefix}
-
         for indel in 0 1; do
           for dp in 2 3 4 5 6 7; do
-            echo "{params.prefix}/INDEL=$indel/DP=$dp/vcf.parquet"
+            output="{params.prefix}/INDEL=$indel/DP=$dp/vcf.parquet"
+
+            mkdir -p $(dirname $output)
+            
             bcftools view -i 'INFO/INDEL='"$indel"' & (SUM(INFO/ADF)<'"$((dp+1))"' | SUM(INFO/ADR)<'"$((dp+1))"') & SUM(INFO/ADF)>='"$dp"' & SUM(INFO/ADR)>='"$dp" {input} |\
               vcf2parquet -i /dev/stdin convert -o "{params.prefix}/INDEL=$indel/DP=$dp/data.parquet"
           done
