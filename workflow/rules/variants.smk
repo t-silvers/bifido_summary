@@ -56,10 +56,10 @@ rule:
         'results/{species}/annot_filtered_calls.csv',
     params:
         glob="'data_lake/variants/*/*/*/*/data.parquet'",
-        strand_dp=config['variants_thresh']['strand_dp'],
-        dp=config['variants_thresh']['dp'],
-        maf=config['variants_thresh']['maf'],
-        qual=config['variants_thresh']['qual'],
+        strand_dp=config['variants']['strand_dp'],
+        dp=config['variants']['dp'],
+        maf=config['variants']['maf'],
+        qual=config['variants']['qual'],
     resources:
         cpus_per_task=32,
         mem_mb=96_000,
