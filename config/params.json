@@ -10,12 +10,10 @@
 		"min_pow_ref": 3
 	},
 	"variants": {
-		"base_qual": 30,
-		"reads_alt": 3,
-		"coverage": 20,
-		"interpos_dist": 500,
+		"dp": 8,
 		"maf": ".95",
-		"qual": 30
+		"qual": 30,
+		"strand_dp": 3
 	},
 	"run_id": "20241024_bifido_all"
 }

@@ -118,5 +118,5 @@ checkpoint fastqs:
         export FASTQS="{input.fastqs}"
 
         duckdb -readonly -init config/.duckdbrc {input.samples} \
-          -c ".read workflow/scripts/create_kraken_bracken_samplesheet.sql" > {output}
+          -c ".read workflow/scripts/create_abundance_samplesheet.sql" > {output}
         '''

@@ -1,3 +1,5 @@
+# TODO: Replace with SQL script
+# TODO: Paritioning on DP mislabeled
 rule hive_partition_vcfs:
     input:
         ancient('results/{species}/variants/{sample}.vcf.gz'),
@@ -48,33 +50,28 @@ def candidate_variant_tables(wildcards):
 
 rule:
     input:
-        candidate_variant_tables
+        candidate_variant_tables,
+        samples_db='data_lake/indexes/samples.duckdb',
     output:
-        'logs/cmt.{species}.done'
-    localrule: True
-    shell: 'touch {output} # Not source why using `touch()` in output not working ...'
+        'results/{species}/annot_filtered_calls.csv',
+    params:
+        glob="'data_lake/variants/*/*/*/*/data.parquet'",
+        strand_dp=config['variants_thresh']['strand_dp'],
+        dp=config['variants_thresh']['dp'],
+        maf=config['variants_thresh']['maf'],
+        qual=config['variants_thresh']['qual'],
+    resources:
+        cpus_per_task=32,
+        mem_mb=96_000,
+        runtime=15,
+    envmodules:
+        'duckdb/nightly'
+    shell:
+        '''
+        export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB"
+        export GLOB={params.glob}
+        export DP={params.dp} MAF={params.maf} QUAL={params.qual} SPECIES={wildcards.species} STRAND_DP={params.strand_dp}
 
-
-# rule create_variants_db:
-#     input:
-#         expand(
-#             'logs/cmt.{species}.done',
-#             species=config['wildcards']['species'].split('|')
-#         )
-#     output:
-#         'results/candidate_variants.duckdb',
-#     params:
-#         vcfs="'results/lake/*/*/nonindels.parquet'",
-#     resources:
-#         cpus_per_task=32,
-#         mem_mb=96_000,
-#         runtime=90
-#     envmodules:
-#         'duckdb/nightly'
-#     shell:
-#         '''
-#         export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB" \
-#                VCFS={params.vcfs}
-        
-#         duckdb {output} -c ".read workflow/scripts/create_variants_db.sql"
-#         '''
+        duckdb -readonly -init config/.duckdbrc {input.samples_db} \
+          -c ".read workflow/scripts/filter_geno_calls.sql" > {output}
+        '''
