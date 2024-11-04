@@ -50,7 +50,7 @@ select
     , g.reference
     , g.allele
 from samples a
-inner join pseudogenome g
+inner join filtered_calls g
         on a.sample = g.sample;
 
 copy (select * from annot_calls) to '/dev/stdout' (format csv);
