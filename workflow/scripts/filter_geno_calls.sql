@@ -30,7 +30,10 @@ variable_sites as (
     from pseudogenome
 	group by chromosome, "position"
 	having count(distinct allele) > 1
-       and count(distinct "sample") > (select count(distinct "sample") / 2 from pseudogenome)
+    -- NOTE: Above median
+    --    and count(distinct "sample") > (select count(distinct "sample") / 2 from pseudogenome)
+    -- NOTE: Non-singleton
+       and count(distinct "sample") > 1
 )
 select g.* 
 from variable_sites v

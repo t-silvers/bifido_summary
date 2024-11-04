@@ -1,6 +1,6 @@
-rule pseudogenome_alignment:
+rule:
     input:
-        ancient('results/candidate_variants.duckdb'),
+        'results/{species}/annot_filtered_calls.csv',
     output:
         'results/aligned_pseudogenomes/FAMILY={donor}/SPECIES={species}.variants.csv',
         'results/aligned_pseudogenomes/FAMILY={donor}/SPECIES={species}.fas',
