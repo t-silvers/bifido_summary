@@ -106,8 +106,8 @@ rule:
 
 checkpoint fastqs:
     input:
-        fastqs='data_lake/indexes/fastqs.csv',
-        samples='data_lake/indexes/samples.duckdb'
+        fastqs=ancient('data_lake/indexes/fastqs.csv'),
+        samples=ancient('data_lake/indexes/samples.duckdb')
     output:
         'results/samplesheets/kraken_bracken.csv'
     localrule: True

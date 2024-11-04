@@ -1,7 +1,7 @@
 checkpoint mapping_samplesheet:
     input:
-        'data_lake/indexes/fastqs.csv',
-        'results/samplesheets/reference_genomes.csv',
+        ancient('data_lake/indexes/fastqs.csv'),
+        ancient('results/samplesheets/reference_genomes.csv'),
     output:
         'results/{species}/samplesheet.csv',
     localrule: True
