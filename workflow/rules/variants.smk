@@ -50,8 +50,9 @@ rule:
     input:
         candidate_variant_tables
     output:
-        touch('logs/cmt.{species}.done')
+        'logs/cmt.{species}.done'
     localrule: True
+    shell: 'touch {output} # Not source why using `touch()` in output not working ...'
 
 
 # rule create_variants_db:

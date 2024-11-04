@@ -47,5 +47,6 @@ rule collect_vcfs:
     input:
         'results/{species}/pipeline_info/pipeline_report.txt',
     output:
+        # TODO: Is `touch()` needed here?
         touch('results/{species}/variants/{sample}.vcf.gz'),
     localrule: True

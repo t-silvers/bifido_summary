@@ -11,6 +11,7 @@ report/*
 logs/*
 dev
 archive
+data_lake
 
 # Nextflow
 .nextflow
