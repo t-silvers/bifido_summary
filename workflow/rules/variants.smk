@@ -1,4 +1,4 @@
-rule hive_partition_vcfs:
+rule:
     input:
         ancient('results/{species}/variants/{sample}.vcf.gz'),
     output:
@@ -33,7 +33,7 @@ def candidate_variant_tables(wildcards):
     )
 
     return expand(
-        'data_lake/vcfs/species={{species}}.sample={sample}/.done',
+        'data_lake/vcfs/species={{species}}/sample={sample}/.done',
         sample=sample_ids
     )
 
