@@ -4,7 +4,10 @@ set threads = getenv('SLURM_CPUS_PER_TASK');
 -- export GLOB="data_lake/variants/*/*/*/*/data.parquet"
 -- export DP=8 MAF=.95 QUAL=30 SPECIES=Bifidobacterium_longum STRAND_DP=3
 
-
+select * from read_parquet(
+    'data_lake/vcfs/*/*/*/*/*.parquet',
+    hive_partitioning = true
+);
 
 -- -----------
 

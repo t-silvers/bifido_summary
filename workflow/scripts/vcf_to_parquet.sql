@@ -4,15 +4,20 @@ set threads = getenv('SLURM_CPUS_PER_TASK');
 create temp table parsed_vcf as
 with vcf as (
     select * exclude (FORMAT)
-        , try_cast(
-            regexp_extract(
-                getenv('SAMPLEID'),
-                '(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)',
-                ['GT', 'DP', 'SP', 'ADF', 'ADR', 'AD']
-            ) as struct(
-                "GT" int, "DP" int, "SP" int, "ADF" int, "ADR" int, "AD" int
-            )
+        regexp_extract(
+            getenv('SAMPLEID'),
+            '(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)',
+            ['GT', 'DP', 'SP', 'ADF', 'ADR', 'AD']
         ) as FORMAT
+        -- , try_cast(
+        --     regexp_extract(
+        --         getenv('SAMPLEID'),
+        --         '(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)',
+        --         ['GT', 'DP', 'SP', 'ADF', 'ADR', 'AD']
+        --     ) as struct(
+        --         "GT" int, "DP" int, "SP" int, "ADF" int, "ADR" int, "AD" int
+        --     )
+        -- ) as FORMAT
         , case when INFO ilike '%INDEL%' then true else false end as "indel"
         , getenv('SPECIES') as species
         , getenv('SAMPLEID') as "sample"
