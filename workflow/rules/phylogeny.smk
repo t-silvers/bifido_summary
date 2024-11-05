@@ -2,28 +2,17 @@ rule:
     input:
         'results/{species}/annot_filtered_calls.csv',
     output:
-        'results/aligned_pseudogenomes/FAMILY={donor}/SPECIES={species}.variants.csv',
-        'results/aligned_pseudogenomes/FAMILY={donor}/SPECIES={species}.fas',
-    params:
-        alt=config['variants_thresh']['reads_alt'],
-        covg=config['variants_thresh']['coverage'],
-        maf=config['variants_thresh']['maf'],
-        qual=config['variants_thresh']['qual'],
+        'results/{species}/filtered_pseudogenome.fas',
     resources:
-        cpus_per_task=32,
-        mem_mb=96_000,
+        cpus_per_task=4,
+        mem_mb=1_000,
         runtime=15,
     envmodules:
         'duckdb/nightly'
     shell:
         '''
-        export MEMORY_LIMIT="$(({resources.mem_mb} / 1100))GB" \
-               DP={params.covg} \
-               MAF={params.maf} \
-               QUAL={params.qual} \
-               SPECIES={wildcards.species} \
-               STRAND_DP={params.alt}
-        
+        export MEMORY_LIMIT="$(({resources.mem_mb} / 1100))GB"
+
         duckdb -readonly {input} -c ".read workflow/scripts/parse_variants.sql" > {output[0]}
 
         cat {output[0]} |\

@@ -32,7 +32,7 @@ wildcard_constraints:
 rule all:
     input:
         expand(
-            'results/{species}/annot_filtered_calls.csv',
+            'results/{species}/tmp',
             species=config['wildcards']['species'].split('|')
         )
     localrule: True
