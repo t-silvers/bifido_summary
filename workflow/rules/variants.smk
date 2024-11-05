@@ -5,7 +5,7 @@ rule:
         'data_lake/vcfs/species={species}/sample={sample}/.done'
     resources:
         cpus_per_task=4,
-        mem_mb=1_000,
+        mem_mb=4_000,
         runtime=5
     envmodules:
         'duckdb/nightly'
