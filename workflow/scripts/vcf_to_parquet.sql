@@ -4,20 +4,15 @@ set threads = getenv('SLURM_CPUS_PER_TASK');
 create temp table parsed_vcf as
 with vcf as (
     select * exclude (FORMAT)
-        regexp_extract(
-            getenv('SAMPLEID'),
-            '(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)',
-            ['GT', 'DP', 'SP', 'ADF', 'ADR', 'AD']
+        , try_cast(
+            regexp_extract(
+                FORMATvals,
+                '(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)',
+                ['GT', 'DP', 'SP', 'ADF', 'ADR', 'AD']
+            ) as struct(
+                "GT" int, "DP" int, "SP" int, "ADF" int, "ADR" int, "AD" int
+            )
         ) as FORMAT
-        -- , try_cast(
-        --     regexp_extract(
-        --         getenv('SAMPLEID'),
-        --         '(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)',
-        --         ['GT', 'DP', 'SP', 'ADF', 'ADR', 'AD']
-        --     ) as struct(
-        --         "GT" int, "DP" int, "SP" int, "ADF" int, "ADR" int, "AD" int
-        --     )
-        -- ) as FORMAT
         , case when INFO ilike '%INDEL%' then true else false end as "indel"
         , getenv('SPECIES') as species
         , getenv('SAMPLEID') as "sample"
@@ -25,6 +20,7 @@ with vcf as (
         getenv('VCF'),
         compression = 'gzip',
         delim = '\t',
+        names = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT', 'FORMATvals'],
         nullstr = '.'
     )
 )
