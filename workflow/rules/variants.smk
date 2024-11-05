@@ -12,7 +12,7 @@ rule:
     shell:
         '''
         export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB"
-        export SAMPLEID="{wildcards.sample}" SPECIES="{wildcards.species}" VCF="{output}"
+        export SAMPLEID="{wildcards.sample}" SPECIES="{wildcards.species}" VCF="{input}"
 
         duckdb -c ".read workflow/scripts/vcf_to_parquet.sql"
 
