@@ -16,7 +16,7 @@ rule:
 
         duckdb -c ".read workflow/scripts/vcf_to_parquet.sql"
 
-        touch {output} # Not source why using `touch()` in output not working ...
+        touch "{output}" # Not source why using `touch()` in output not working ...
         '''
 
 
