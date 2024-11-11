@@ -31,8 +31,7 @@ wildcard_constraints:
 
 rule all:
     input:
-        'results/kraken_bracken_samplesheet.csv'
-        # 'results/reference_genomes.csv'
+        'results/reference_genomes.csv'
         # expand(
         #     'results/{species}/tmp',
         #     species=config['wildcards']['species'].split('|')
