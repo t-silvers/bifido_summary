@@ -91,9 +91,8 @@ rule:
     output:
         'data/.bracken.done',
     params:
-        db='data/index.duckdb'
-    params:
-        glob="'results/bracken/*.bracken'"
+        db='data/index.duckdb',
+        glob="'results/bracken/*.bracken'",
     resources:
         cpus_per_task=8,
         mem_mb=4_000,
