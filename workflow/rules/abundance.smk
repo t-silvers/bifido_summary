@@ -87,7 +87,7 @@ def abundance_output(wildcards):
 
 rule:
     input:
-        abundance_output
+        ancient(abundance_output)
     output:
         'data/.bracken.done',
     params:
