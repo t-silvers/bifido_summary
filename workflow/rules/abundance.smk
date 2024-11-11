@@ -116,8 +116,7 @@ checkpoint reference_genomes:
     output:
         'results/reference_genomes.csv'
     params:
-        db='data/index.duckdb'
-    params:
+        db='data/index.duckdb',
         read_frac=config['mapping']['min_frac_ref'],
         read_pow=config['mapping']['min_pow_ref'],
     localrule: True
