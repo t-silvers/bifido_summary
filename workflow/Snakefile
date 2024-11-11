@@ -31,7 +31,7 @@ wildcard_constraints:
 
 rule all:
     input:
-        paired_fastqs
+        'results/kraken_bracken_samplesheet.csv'
         # expand(
         #     'results/{species}/tmp',
         #     species=config['wildcards']['species'].split('|')
