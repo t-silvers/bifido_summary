@@ -89,7 +89,9 @@ rule:
     input:
         abundance_output
     output:
-        'data_lake/indexes/abundance.duckdb',
+        'data/.bracken.done',
+    params:
+        db='data/index.duckdb'
     params:
         glob="'results/bracken/*.bracken'"
     resources:
@@ -103,17 +105,19 @@ rule:
         export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB"
         export GLOB={params.glob}
         
-        duckdb -init config/.duckdbrc {output} \
-          -c ".read workflow/scripts/clean_bracken_output.sql"
+        duckdb -init config/.duckdbrc {params.db} -c ".read models/bracken.sql"
+
+        touch {output}
         '''
 
 
 checkpoint reference_genomes:
     input:
-        samples='data_lake/indexes/samples.duckdb',
-        abundance='data_lake/indexes/abundance.duckdb',
+        'data/.bracken.done',
     output:
-        'results/samplesheets/reference_genomes.csv'
+        'results/reference_genomes.csv'
+    params:
+        db='data/index.duckdb'
     params:
         read_frac=config['mapping']['min_frac_ref'],
         read_pow=config['mapping']['min_pow_ref'],
@@ -124,8 +128,6 @@ checkpoint reference_genomes:
         '''
         export READ_FRAC={params.read_frac} READ_POW={params.read_pow}
 
-        duckdb -readonly -init config/.duckdbrc {input.samples} \
-          -c 'copy (select "sample", ID, taxon from samples) to "/dev/stdout" (format csv);' |\
-        duckdb -readonly -init config/.duckdbrc {input.abundance} \
+        duckdb -readonly -init config/.duckdbrc {params.db} \
           -c '.read workflow/scripts/match_reference_genome.sql' > {output}
         '''

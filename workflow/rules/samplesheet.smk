@@ -1,16 +1,3 @@
-rule:
-    output:
-        'data_lake/indexes/enums.duckdb'
-    localrule: True
-    envmodules:
-        'duckdb/1.0'
-    shell:
-        '''
-        duckdb -init config/.duckdbrc {output} \
-          -c ".read workflow/scripts/create_enums.sql"
-        '''
-
-
 for info, exe in zip(['seq_info', 'sample_info'], ['csv', 'xlsx']):
     rule:
         name:
@@ -30,7 +17,7 @@ for info, exe in zip(['seq_info', 'sample_info'], ['csv', 'xlsx']):
 
 rule:
     output:
-        'data_lake/indexes/fastqs-indexswapped.csv'
+        'results/fastqs-indexswapped.csv'
     params:
         glob=f"'{config['data']['directory']}*.fastq.gz'",
         pat=config['data']['pat'],
@@ -41,57 +28,46 @@ rule:
         '''
         export GLOB={params.glob} PAT={params.pat}
 
-        duckdb -init config/.duckdbrc \
-          -c ".read workflow/scripts/collect_fastqs.sql" > {output}
+        duckdb -init config/.duckdbrc -c ".read models/fastqs.sql" > {output}
         '''
 
 
 rule:
     input:
-        enums='data_lake/indexes/enums.duckdb',
-        info='results/raw_sample_info.xlsx',
+        sample_info=ancient('results/raw_sample_info.xlsx'),
+        seq_info=ancient('results/raw_seq_info.csv'),
     output:
-        'data_lake/indexes/samples.duckdb'
+        'data/.enums.done',
+        'data/.sample_info.done',
+        'data/.seq_info.done',
+    params:
+        db='data/index.duckdb'
     localrule: True
     envmodules:
         'duckdb/1.0'
     shell:
         '''
-        duckdb -init config/.duckdbrc \
-          -c "attach '{input.enums}' as enums_db (read_only);
-          attach '{output}' as info_db;
-          copy from database enums_db to info_db;"
+        export SAMPLE_INFO="{input.sample_info}"
+        export SEQ_INFO="{input.seq_info}"
 
-        export SAMPLE_INFO="{input.info}"
+        duckdb -init config/.duckdbrc {params.db} -c ".read models/enums.sql"
+        duckdb -init config/.duckdbrc {params.db} -c ".read models/sample_info.sql"
+        duckdb -init config/.duckdbrc {params.db} -c ".read models/seq_info.sql"
 
-        duckdb -init config/.duckdbrc {output} \
-          -c ".read workflow/scripts/clean_sample_info.sql"
+        touch {output}
         '''
 
 
 rule:
     input:
-        info='results/raw_seq_info.csv',
+        'data/.enums.done',
+        'data/.sample_info.done',
+        'data/.seq_info.done',
+        fastqs='results/fastqs-indexswapped.csv',
     output:
-        'data_lake/indexes/seq.duckdb'
-    localrule: True
-    envmodules:
-        'duckdb/1.0'
-    shell:
-        '''
-        export SEQ_INFO="{input.info}"
-
-        duckdb -init config/.duckdbrc {output} \
-          -c ".read workflow/scripts/clean_seq_info.sql"
-        '''
-
-
-rule:
-    input:
-        fastqs='data_lake/indexes/fastqs-indexswapped.csv',
-        seqinfo='data_lake/indexes/seq.duckdb',
-    output:
-        'data_lake/indexes/fastqs.csv'
+        'results/fastqs.csv'
+    params:
+        db='data/index.duckdb'
     localrule: True
     envmodules:
         'duckdb/1.0'
@@ -99,24 +75,23 @@ rule:
         '''
         export FASTQS="{input.fastqs}"
 
-        duckdb -readonly -init config/.duckdbrc {input.seqinfo} \
-          -c ".read workflow/scripts/fix_index_swap.sql" > {output}
+        duckdb -readonly -init config/.duckdbrc {params.db} -c ".read workflow/scripts/fix_index_swap.sql" > {output}
         '''
 
 
 checkpoint fastqs:
     input:
-        fastqs=ancient('data_lake/indexes/fastqs.csv'),
-        samples=ancient('data_lake/indexes/samples.duckdb')
+        'results/fastqs.csv'
     output:
-        'results/samplesheets/kraken_bracken.csv'
+        'results/kraken_bracken_samplesheet.csv'
+    params:
+        db='data/index.duckdb'
     localrule: True
     envmodules:
         'duckdb/1.0'
     shell:
         '''
-        export FASTQS="{input.fastqs}"
+        export FASTQS="{input}"
 
-        duckdb -readonly -init config/.duckdbrc {input.samples} \
-          -c ".read workflow/scripts/create_abundance_samplesheet.sql" > {output}
+        duckdb -readonly -init config/.duckdbrc {params.db} -c ".read workflow/scripts/create_abundance_samplesheet.sql" > {output}
         '''

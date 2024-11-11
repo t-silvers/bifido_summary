@@ -11,7 +11,7 @@
 		"min_pow_ref": 3
 	},
 	"variants": {
-		"dp": 5,
+		"dp": 8,
 		"maf": ".95",
 		"qual": 30,
 		"strand_dp": 3

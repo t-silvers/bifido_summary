@@ -1,6 +1,6 @@
 load spatial;
 
-create table samples as 
+create table sample_info as 
 with combined_tmp as (
     select * exclude(taxon_raw)
         , regexp_replace(trim(taxon_raw), ' ', '_', 'g') as taxon_raw

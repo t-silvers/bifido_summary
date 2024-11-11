@@ -1,26 +1,4 @@
-rule:
-    input:
-        ancient('results/{species}/variants/{sample}.vcf.gz'),
-    output:
-        'data_lake/vcfs/species={species}/sample={sample}/.done'
-    resources:
-        cpus_per_task=4,
-        mem_mb=4_000,
-        runtime=5
-    envmodules:
-        'duckdb/nightly'
-    shell:
-        '''
-        export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB"
-        export SAMPLEID="{wildcards.sample}" SPECIES="{wildcards.species}" VCF="{input}"
-
-        duckdb -c ".read workflow/scripts/vcf_to_parquet.sql"
-
-        touch "{output}" # Not source why using `touch()` in output not working ...
-        '''
-
-
-def candidate_variant_tables(wildcards):
+def species_vcfs(wildcards):
     import pandas as pd
 
     sample_ids = (
@@ -33,25 +11,40 @@ def candidate_variant_tables(wildcards):
     )
 
     return expand(
-        'data_lake/vcfs/species={{species}}/sample={sample}/.done',
+        'results/{{species}}/variants/{sample}.vcf.gz',
         sample=sample_ids
     )
 
 
 rule:
-    input: candidate_variant_tables
-    output: 'results/{species}/tmp'
-    shell: 'touch {output}'
+    input:
+        species_vcfs
+    output:
+        'data/variants/{species}.duckdb'
+    params:
+        glob="'results/{species}/variants/*.filtered.vcf.gz'"
+    resources:
+        cpus_per_task=48,
+        mem_mb=450_000,
+        runtime=15
+    envmodules:
+        'duckdb/nightly'
+    shell:
+        '''
+        export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB"
+        export FILTERED_VCFS={params.glob}
+
+        duckdb {output} -c ".read models/annotated_vcfs.sql"
+        '''
 
 
 # rule:
 #     input:
-#         candidate_variant_tables,
-#         samples_db='data_lake/indexes/samples.duckdb',
+#         'data/variants/{species}.duckdb',
 #     output:
 #         'results/{species}/annot_filtered_calls.csv',
 #     params:
-#         glob="'data_lake/variants/*/*/*/*/data.parquet'",
+#         glob="'data_lake/vcfs/*/*/*/*/*.parquet'",
 #         strand_dp=config['variants']['strand_dp'],
 #         dp=config['variants']['dp'],
 #         maf=config['variants']['maf'],
