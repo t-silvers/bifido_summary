@@ -1,6 +1,6 @@
 create type family_relationship as enum ('F', 'M', 'B');
 
-create table relationship_ref (
+create temp table relationship_ref (
     relationship_raw varchar,
     relationship family_relationship
 );
@@ -27,7 +27,7 @@ create type bacteria_taxon as enum (
     'Staphylococcus_aureus'
 );
 
-create table taxon_ref (
+create temp table taxon_ref (
     taxon_raw varchar,
     taxon bacteria_taxon
 );
@@ -50,7 +50,7 @@ values
     ('Lactococcus_lactis', 'Lactococcus_lactis'),
     ('Staphylococcus_aureus', 'Staphylococcus_aureus');
 
-create table date_ref (
+create temp table date_ref (
     time_cat varchar,
     time_weeks varchar
 );
