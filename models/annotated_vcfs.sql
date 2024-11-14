@@ -28,9 +28,10 @@ with vcfs as (
             delim = '\t',
             filename = True,
             header = True,
+            ignore_errors = True,
             new_line = '\n', 
-            nullstr = '.',
-            skip = 43
+            -- skip = 43
+            nullstr = '.'
         )
 
 ),
