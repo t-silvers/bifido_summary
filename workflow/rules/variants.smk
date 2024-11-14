@@ -38,36 +38,11 @@ rule:
         '''
 
 
-# rule:
-#     input:
-#         'data/variants/{species}.duckdb',
-#     output:
-#         'results/{species}/annot_filtered_calls.csv',
-#     params:
-#         strand_dp=config['variants']['strand_dp'],
-#         dp=config['variants']['dp'],
-#         maf=config['variants']['maf'],
-#         qual=config['variants']['qual'],
-#     resources:
-#         cpus_per_task=12,
-#         mem_mb=16_000,
-#         runtime=5,
-#     envmodules:
-#         'duckdb/nightly'
-#     shell:
-#         '''
-#         export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB"
-#         export DP={params.dp} MAF={params.maf} QUAL={params.qual} STRAND_DP={params.strand_dp}
-
-#         duckdb -readonly -init config/.duckdbrc {input} -c ".read workflow/scripts/filter_geno.sql" > {output}
-#         '''
-
-
 rule:
     input:
         'data/variants/{species}.duckdb',
     output:
-        'results/{species}/annot_filtered_indel_calls.csv',
+        'results/{species}/annot_filtered_calls.csv',
     params:
         strand_dp=config['variants']['strand_dp'],
         dp=config['variants']['dp'],

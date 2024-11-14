@@ -1,6 +1,6 @@
 rule:
     input:
-        'results/{species}/annot_filtered_calls.csv',
+        ancient('results/{species}/annot_filtered_calls.csv'),
     output:
         'results/{species}/filtered_pseudogenome.fas',
     params:
