@@ -47,7 +47,7 @@ variable_positions as (
     select
         chromosome, position
     from
-        read_bias_filtered
+        maf_readbias_filtered
     group by
         chromosome, position
     having
@@ -56,14 +56,14 @@ variable_positions as (
             select 
                 count(distinct ID) 
             from 
-                read_bias_filtered
+                maf_readbias_filtered
         )
 ),
 final as (
     select
         *
     from
-        read_bias_filtered
+        maf_readbias_filtered
     where
         (chromosome, position) in (
             select
