@@ -6,14 +6,14 @@ rule:
     params:
         db='data/index.duckdb',
     resources:
-        cpus_per_task=4,
-        mem_mb=1_000,
-        runtime=15,
+        cpus_per_task=12,
+        mem_mb=16_000,
+        runtime=5,
     envmodules:
         'duckdb/nightly'
     shell:
         '''
-        export MEMORY_LIMIT="$(({resources.mem_mb} / 1100))GB"
+        export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB"
         export FILTERED_CALLS={input}
 
         duckdb -readonly {params.db} -c ".read workflow/scripts/calls_to_msa.sql" > {output}
