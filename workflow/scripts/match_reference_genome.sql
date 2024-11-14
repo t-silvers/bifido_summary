@@ -13,10 +13,10 @@ from
             "sample", ID, taxon
         
         from
-            samples
+            sample_info
     ) s
 
-inner join abundance a
+inner join bracken a
     on s.sample = a.sample
 
 where

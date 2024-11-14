@@ -33,7 +33,7 @@ rule all:
     input:
         'results/reference_genomes.csv'
         # expand(
-        #     'results/{species}/tmp',
+        #     'results/{species}/annot_filtered_calls.csv',
         #     species=config['wildcards']['species'].split('|')
         # )
     localrule: True

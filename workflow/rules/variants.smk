@@ -18,14 +18,14 @@ def species_vcfs(wildcards):
 
 rule:
     input:
-        species_vcfs
+        ancient(species_vcfs)
     output:
         'data/variants/{species}.duckdb'
     params:
         glob="'results/{species}/variants/*.filtered.vcf.gz'"
     resources:
-        cpus_per_task=48,
-        mem_mb=450_000,
+        cpus_per_task=24,
+        mem_mb=120_000,
         runtime=15
     envmodules:
         'duckdb/nightly'
@@ -38,29 +38,26 @@ rule:
         '''
 
 
-# rule:
-#     input:
-#         'data/variants/{species}.duckdb',
-#     output:
-#         'results/{species}/annot_filtered_calls.csv',
-#     params:
-#         glob="'data_lake/vcfs/*/*/*/*/*.parquet'",
-#         strand_dp=config['variants']['strand_dp'],
-#         dp=config['variants']['dp'],
-#         maf=config['variants']['maf'],
-#         qual=config['variants']['qual'],
-#     resources:
-#         cpus_per_task=32,
-#         mem_mb=96_000,
-#         runtime=15,
-#     envmodules:
-#         'duckdb/nightly'
-#     shell:
-#         '''
-#         export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB"
-#         export GLOB={params.glob}
-#         export DP={params.dp} MAF={params.maf} QUAL={params.qual} SPECIES={wildcards.species} STRAND_DP={params.strand_dp}
+rule:
+    input:
+        'data/variants/{species}.duckdb',
+    output:
+        'results/{species}/annot_filtered_calls.csv',
+    params:
+        strand_dp=config['variants']['strand_dp'],
+        dp=config['variants']['dp'],
+        maf=config['variants']['maf'],
+        qual=config['variants']['qual'],
+    resources:
+        cpus_per_task=32,
+        mem_mb=96_000,
+        runtime=15,
+    envmodules:
+        'duckdb/nightly'
+    shell:
+        '''
+        export MEMORY_LIMIT="$(({resources.mem_mb} / 1200))GB"
+        export DP={params.dp} MAF={params.maf} QUAL={params.qual} STRAND_DP={params.strand_dp}
 
-#         duckdb -readonly -init config/.duckdbrc {input.samples_db} \
-#           -c ".read workflow/scripts/filter_geno_calls.sql" > {output}
-#         '''
+        duckdb -readonly -init config/.duckdbrc {input} -c ".read workflow/scripts/filter_geno.sql" > {output}
+        '''
