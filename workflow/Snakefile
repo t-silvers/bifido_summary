@@ -19,7 +19,7 @@ include: 'rules/samplesheet.smk'
 include: 'rules/abundance.smk'
 include: 'rules/mapping.smk'
 include: 'rules/variants.smk'
-# include: 'rules/phylogeny.smk'
+include: 'rules/phylogeny.smk'
 # include: 'rules/prepare_results.smk'
 
 
@@ -33,7 +33,7 @@ wildcard_constraints:
 rule all:
     input:
         expand(
-            'results/{species}/annot_filtered_indel_calls.csv',
+            'results/{species}/filtered_pseudogenome-filtered.fas',
             species=config['wildcards']['species'].split('|')
         )
     localrule: True

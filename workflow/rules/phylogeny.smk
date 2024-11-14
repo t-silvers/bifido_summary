@@ -3,6 +3,8 @@ rule:
         'results/{species}/annot_filtered_calls.csv',
     output:
         'results/{species}/filtered_pseudogenome.fas',
+    params:
+        db='data/index.duckdb',
     resources:
         cpus_per_task=4,
         mem_mb=1_000,
@@ -12,19 +14,17 @@ rule:
     shell:
         '''
         export MEMORY_LIMIT="$(({resources.mem_mb} / 1100))GB"
+        export FILTERED_CALLS={input}
 
-        duckdb -readonly {input} -c ".read workflow/scripts/parse_variants.sql" > {output[0]}
-
-        cat {output[0]} |\
-          duckdb -c ".read workflow/scripts/to_msa.sql" > {output[1]}
+        duckdb -readonly {params.db} -c ".read workflow/scripts/calls_to_msa.sql" > {output}
         '''
 
 
 rule filter_invariant_sites:
     input:
-        'results/aligned_pseudogenomes/FAMILY={donor}/SPECIES={species}.fas',
+        'results/{species}/filtered_pseudogenome.fas',
     output:
-        'results/aligned_pseudogenomes/FAMILY={donor}/SPECIES={species}-filtered.fas',
+        'results/{species}/filtered_pseudogenome-filtered.fas',
     localrule: True
     envmodules:
         'snp-sites/2.5.1'
