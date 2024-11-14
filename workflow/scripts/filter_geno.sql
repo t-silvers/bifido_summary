@@ -8,7 +8,8 @@ with snvs_only as (
     from
         annotated_vcfs
     where
-        not indel
+        indel
+        -- not indel
 ),
 quality_depth_filtered as (
     select 
