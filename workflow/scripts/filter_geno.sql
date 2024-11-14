@@ -6,7 +6,7 @@ with snvs_only as (
     select 
         * exclude(indel)
     from
-        vcfs_test
+        annotated_vcfs
     where
         not indel
 ),
