@@ -33,7 +33,7 @@ wildcard_constraints:
 rule all:
     input:
         expand(
-            'results/{species}/filtered_pseudogenome-filtered.fas',
+            'results/{species}/filtered_pseudogenome.fas',
             species=config['wildcards']['species'].split('|')
         )
     localrule: True
