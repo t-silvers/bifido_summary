@@ -36,15 +36,15 @@ rule filter_invariant_sites:
 
 rule raxml_ng:
     input:
-        'results/aligned_pseudogenomes/FAMILY={donor}/SPECIES={species}-filtered.fas',
+        'results/{species}/filtered_pseudogenome-filtered.fas',
     params:
         extra='--all --model GTR+G --bs-trees 200',
         # outgroup=lambda wildcards: '--outgroup ' + config['outgroup'][wildcards.donor][wildcards.species]['ID'],
         outgroup='',
-        prefix='results/raxml_ng/FAMILY={donor}/SPECIES={species}',
+        prefix='results/{species}/{species}',
     output:
         multiext(
-            'results/raxml_ng/FAMILY={donor}/SPECIES={species}.raxml',
+            'results/{species}/{species}.raxml',
             '.reduced.phy',
             '.rba',
             '.bestTreeCollapsed',
@@ -75,48 +75,46 @@ rule raxml_ng:
         '''
 
 
-def trees_output(wildcards):
-    import pandas as pd
+# def trees_output(wildcards):
+#     import pandas as pd
 
-    donor_list = config['wildcards']['donors'].split('|')
+#     species_list = config['wildcards']['species'].split('|')
+
+#     matched_donors = (
+#         pd.read_csv(
+#             checkpoints.samplesheet.get(
+#                 **wildcards
+#             ).output[0]
+#         )
+#         .query('donor == @donor_list')
+#         .filter(['sample', 'donor'])
+#         .drop_duplicates()
+#     )
     
-    species_list = config['wildcards']['species'].split('|')
+#     matched_species = (
+#         pd.read_csv(
+#             checkpoints.reference_genomes.get(
+#                 **wildcards
+#             ).output[1]
+#         )
+#         .rename(columns={'taxon': 'species'})
+#         .query('species == @species_list')
+#         .filter(['sample', 'species'])
+#         .drop_duplicates()
+#     )
 
-    matched_donors = (
-        pd.read_csv(
-            checkpoints.samplesheet.get(
-                **wildcards
-            ).output[0]
-        )
-        .query('donor == @donor_list')
-        .filter(['sample', 'donor'])
-        .drop_duplicates()
-    )
-    
-    matched_species = (
-        pd.read_csv(
-            checkpoints.reference_genomes.get(
-                **wildcards
-            ).output[1]
-        )
-        .rename(columns={'taxon': 'species'})
-        .query('species == @species_list')
-        .filter(['sample', 'species'])
-        .drop_duplicates()
-    )
-
-    return list(
-        matched_donors
-        .merge(matched_species)
-        .assign(sample=lambda df: df.pop('sample').astype(int))
-        .query('sample != @EXCLUDE')
-        .query('sample != @INDEX_SWAPPED')
-        .drop_duplicates()
-        .transpose()
-        .apply(lambda df: 'results/raxml_ng/FAMILY={donor}/SPECIES={species}.raxml.bestTree'.format(**df.to_dict()))
-        .values
-        .flatten()
-    )
+#     return list(
+#         matched_donors
+#         .merge(matched_species)
+#         .assign(sample=lambda df: df.pop('sample').astype(int))
+#         .query('sample != @EXCLUDE')
+#         .query('sample != @INDEX_SWAPPED')
+#         .drop_duplicates()
+#         .transpose()
+#         .apply(lambda df: 'results/raxml_ng/FAMILY={donor}/SPECIES={species}.raxml.bestTree'.format(**df.to_dict()))
+#         .values
+#         .flatten()
+#     )
 
 
 rule:
