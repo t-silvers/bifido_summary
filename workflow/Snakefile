@@ -17,8 +17,8 @@ module widevariant:
 
 include: 'rules/samplesheet.smk'
 include: 'rules/abundance.smk'
-# include: 'rules/mapping.smk'
-# include: 'rules/variants.smk'
+include: 'rules/mapping.smk'
+include: 'rules/variants.smk'
 # include: 'rules/phylogeny.smk'
 # include: 'rules/prepare_results.smk'
 
@@ -31,11 +31,10 @@ wildcard_constraints:
 
 rule all:
     input:
-        'results/reference_genomes.csv'
-        # expand(
-        #     'results/{species}/annot_filtered_calls.csv',
-        #     species=config['wildcards']['species'].split('|')
-        # )
+        expand(
+            'results/{species}/annot_filtered_calls.csv',
+            species=config['wildcards']['species'].split('|')
+        )
     localrule: True
     default_target: True
 

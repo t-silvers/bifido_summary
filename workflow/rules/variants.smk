@@ -26,7 +26,7 @@ rule:
     resources:
         cpus_per_task=24,
         mem_mb=120_000,
-        runtime=15
+        runtime=10,
     envmodules:
         'duckdb/nightly'
     shell:
@@ -49,9 +49,9 @@ rule:
         maf=config['variants']['maf'],
         qual=config['variants']['qual'],
     resources:
-        cpus_per_task=32,
-        mem_mb=96_000,
-        runtime=15,
+        cpus_per_task=12,
+        mem_mb=16_000,
+        runtime=5,
     envmodules:
         'duckdb/nightly'
     shell:
