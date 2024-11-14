@@ -117,9 +117,9 @@ rule raxml_ng:
 #     )
 
 
-rule:
-    input:
-        trees_output
-    output:
-        touch('results/phylogenies.done')
-    localrule: True
+# rule:
+#     input:
+#         trees_output
+#     output:
+#         touch('results/phylogenies.done')
+#     localrule: True
