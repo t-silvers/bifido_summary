@@ -27,7 +27,8 @@ wildcard_constraints:
     sample=r'\d+',
     donors=config['wildcards']['donors'],
     relationships=config['wildcards']['relationships'],
-    species=config['wildcards']['species'],
+    species=config['wildcards']['species']
+
 
 rule all:
     input:
