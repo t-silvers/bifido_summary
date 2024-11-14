@@ -3,8 +3,7 @@
 	"wildcards": {
 		"donors": "B001",
 		"relationships": "F|M|B",
-		"all_species": "Bifidobacterium_bifidum|Bifidobacterium_longum|Enterococcus_faecalis|Escherichia_coli|Staphylococcus_aureus",
-		"species": "Bifidobacterium_bifidum|Bifidobacterium_longum"
+		"species": "Bifidobacterium_bifidum|Bifidobacterium_longum|Enterococcus_faecalis|Escherichia_coli|Staphylococcus_aureus"
 	},
 	"mapping": {
 		"min_frac_ref": ".5",
