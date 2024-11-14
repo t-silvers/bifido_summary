@@ -23,7 +23,7 @@ quality_depth_filtered as (
 ),
 maf_readbias_filtered as (
     select 
-        ID
+        "sample"
         , chromosome
         , position
         , case 
@@ -52,9 +52,9 @@ variable_positions as (
         chromosome, position
     having
         count(distinct allele) > 1
-        and count(ID) > .95 * (
+        and count("sample") > .95 * (
             select 
-                count(distinct ID) 
+                count(distinct "sample") 
             from 
                 maf_readbias_filtered
         )
@@ -72,7 +72,7 @@ final as (
                 variable_positions
         )
     order by
-        ID
+        "sample"
         , chromosome
         , position
 )
