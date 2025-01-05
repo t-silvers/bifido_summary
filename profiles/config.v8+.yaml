@@ -16,3 +16,4 @@ default-resources:
     jobname: "'slurm_%x_%j'"
     mem_mb: 512
     runtime: 30 # minutes
+    tmpdir: "'/ptmp/thosi'"

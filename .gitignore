@@ -4,13 +4,16 @@ results/*
 report/*
 !report/*.pdf
 !report/*.tex
-!report/figures
+# !report/figures # TODO: Too many figures as-is ...
 
 # Log directories, caches
 # -----------------------
 logs/*
 dev
 archive
+data
+
+# TODO: deprecate
 data_lake
 
 # Nextflow
